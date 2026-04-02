@@ -249,7 +249,7 @@ def collect_youtube():
 
     from collector.youtube_collector import collect_youtube as yt_collect
     try:
-        videos = yt_collect(YOUTUBE_API_KEY, days_back=1)
+        videos = yt_collect(YOUTUBE_API_KEY, days_back=2)
         return videos
     except Exception as e:
         logger.error(f"유튜브 수집 실패: {e}")
