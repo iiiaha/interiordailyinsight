@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인테리어 인사이트 데일리</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f0f14;font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;color:#e0e0e0;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0f0f14;">
+<tr><td align="center" style="padding:20px 10px;">
+
+<!-- 메인 카드 -->
+<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color:#1a1a24;border-radius:16px;overflow:hidden;border:1px solid #2a2a3a;">
+
+  <!-- 헤더 -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#1e3a5f 0%,#0d1b2a 100%);padding:36px 40px;text-align:center;">
+      <p style="margin:0 0 6px;font-size:11px;color:#4cc9f0;letter-spacing:3px;text-transform:uppercase;">DAILY BUSINESS INTELLIGENCE</p>
+      <h1 style="margin:0 0 10px;font-size:24px;color:#ffffff;font-weight:700;">인테리어 인사이트 데일리</h1>
+      <p style="margin:0;font-size:13px;color:#7b8ca8;">{{ report_date }} | {{ analysis.meta.total_posts_analyzed }}개 게시글 분석</p>
+      {% if analysis.meta.data_quality_note %}
+      <p style="margin:8px 0 0;font-size:11px;color:#5a6577;font-style:italic;">{{ analysis.meta.data_quality_note }}</p>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- 인사 -->
+  <tr>
+    <td style="padding:24px 40px 0;">
+      <p style="margin:0;font-size:14px;color:#a0aec0;">{% if subscriber_name %}{{ subscriber_name }}님, {% endif %}오늘의 인테리어 시장 인사이트입니다.</p>
+    </td>
+  </tr>
+
+  <!-- Section 1: Executive Brief -->
+  {% set s1 = analysis.section1_executive_brief %}
+  <tr>
+    <td style="padding:24px 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:linear-gradient(135deg,#1e3a5f 0%,#162d4a 100%);border-radius:12px;padding:24px;border:1px solid #2a4a6a;">
+            <p style="margin:0 0 4px;font-size:11px;color:#4cc9f0;letter-spacing:2px;font-weight:700;">EXECUTIVE BRIEF</p>
+            <p style="margin:0 0 16px;font-size:18px;color:#ffffff;line-height:1.6;font-weight:600;">{{ s1.one_liner }}</p>
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background-color:{% if s1.market_temperature == '뜨거움' %}#ef4444{% elif s1.market_temperature == '보통' %}#f59e0b{% else %}#3b82f6{% endif %};border-radius:20px;padding:4px 14px;">
+                  <span style="font-size:12px;color:#ffffff;font-weight:700;">시장 온도: {{ s1.market_temperature }}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:8px 0 0;font-size:12px;color:#7b8ca8;">{{ s1.market_temperature_reason }}</p>
+          </td>
+        </tr>
+      </table>
+      <!-- TOP 3 -->
+      {% if s1.top3_this_week %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
+        {% for item in s1.top3_this_week %}
+        <tr>
+          <td style="padding:8px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="32" style="vertical-align:top;">
+                  <span style="display:inline-block;width:24px;height:24px;background-color:#1e3a5f;border-radius:50%;text-align:center;line-height:24px;font-size:12px;color:#4cc9f0;font-weight:700;">{{ loop.index }}</span>
+                </td>
+                <td style="font-size:13px;color:#c0cad8;line-height:1.5;padding-left:8px;">{{ item }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 2: Demand Signals -->
+  {% set s2 = analysis.section2_demand_signals %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 4px;font-size:16px;color:#ffffff;">&#x1F4E1; {{ s2.title }}</h2>
+      <p style="margin:0 0 14px;font-size:12px;color:#5a6577;">{{ s2.description }}</p>
+      {% for d in s2.hot_demand %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;background-color:#141420;border-radius:10px;border:1px solid #2a2a3a;">
+        <tr>
+          <td style="padding:16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td><span style="font-size:14px;color:#ffffff;font-weight:700;">{{ d.category }}</span></td>
+                <td style="text-align:right;">
+                  <span style="background-color:{% if d.urgency == '즉시' %}#dc262630{% elif d.urgency == '1개월 내' %}#f59e0b30{% else %}#3b82f630{% endif %};color:{% if d.urgency == '즉시' %}#ef4444{% elif d.urgency == '1개월 내' %}#f59e0b{% else %}#60a5fa{% endif %};padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">{{ d.urgency }}</span>
+                  <span style="margin-left:8px;font-size:12px;color:#5a6577;">{{ d.signal_count }}건</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:8px 0 4px;font-size:12px;color:#7b8ca8;">근거: {{ d.urgency_basis }}</p>
+            {% if d.typical_budget_mentioned != '언급 없음' %}
+            <p style="margin:0 0 4px;font-size:12px;color:#7b8ca8;">예산: {{ d.typical_budget_mentioned }}</p>
+            {% endif %}
+            <p style="margin:8px 0 0;font-size:12px;color:#4cc9f0;">&#x1F4AC; 영업 접근: {{ d.sales_entry_point }}</p>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+      {% if s2.cold_demand %}
+      <p style="margin:12px 0 6px;font-size:12px;color:#5a6577;font-weight:600;">&#x1F4A4; 수요 감소 신호</p>
+      {% for c in s2.cold_demand %}
+      <p style="margin:0 0 6px;font-size:12px;color:#6b7280;">{{ c.category }} &mdash; {{ c.possible_reason }}<br><span style="color:#4cc9f0;">&#x2192; {{ c.action }}</span></p>
+      {% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 3: Pricing Intelligence -->
+  {% set s3 = analysis.section3_pricing_intelligence %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F4B0; {{ s3.title }}</h2>
+      {% for p in s3.price_resistance_points %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;background-color:#1a1520;border-left:3px solid #ef4444;border-radius:0 8px 8px 0;">
+        <tr>
+          <td style="padding:12px 16px;">
+            <p style="margin:0 0 4px;font-size:13px;color:#ffffff;font-weight:600;">&#x26A0;&#xFE0F; {{ p.item }}</p>
+            <p style="margin:0 0 2px;font-size:12px;color:#ef4444;">소비자 기대가: {{ p.consumer_perceived_fair_price }}</p>
+            <p style="margin:0 0 4px;font-size:12px;color:#7b8ca8;">불만: "{{ p.common_complaint }}"</p>
+            <p style="margin:0;font-size:12px;color:#4cc9f0;">&#x2192; {{ p.business_implication }}</p>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+      {% if s3.price_acceptance_points %}
+      <p style="margin:12px 0 6px;font-size:12px;color:#5a6577;font-weight:600;">&#x2705; 소비자가 수용한 가격</p>
+      {% for a in s3.price_acceptance_points %}
+      <p style="margin:0 0 6px;font-size:12px;color:#a0aec0;">{{ a.item }}: {{ a.accepted_price_range }} &mdash; <span style="color:#7b8ca8;">{{ a.reason_for_acceptance }}</span></p>
+      {% endfor %}
+      {% endif %}
+      {% if s3.budget_signals %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;background-color:#141420;border-radius:8px;">
+        <tr>
+          <td style="padding:12px 16px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#5a6577;font-weight:600;">예산 분포</p>
+            <p style="margin:0;font-size:12px;color:#a0aec0;">100만 미만: {{ s3.budget_signals.low_budget_under_100 }} | 100~500만: {{ s3.budget_signals.mid_budget_100_500 }} | 500만+: {{ s3.budget_signals.high_budget_over_500 }}</p>
+            {% if s3.budget_signals.analyst_note %}
+            <p style="margin:6px 0 0;font-size:11px;color:#7b8ca8;font-style:italic;">{{ s3.budget_signals.analyst_note }}</p>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 4: Material Trend -->
+  {% set s4 = analysis.section4_material_trend %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F3D7;&#xFE0F; {{ s4.title }}</h2>
+      {% for m in s4.rising_materials %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+        <tr>
+          <td style="padding:8px 0;">
+            <span style="display:inline-block;background-color:#065f4620;color:#34d399;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">&#x2191; {{ m.mention_trend }}</span>
+            <span style="margin-left:8px;font-size:14px;color:#ffffff;font-weight:600;">{{ m.name }}</span>
+            <p style="margin:4px 0 2px;font-size:12px;color:#a0aec0;">{{ m.why_consumers_want_it }}</p>
+            <p style="margin:0;font-size:12px;color:#4cc9f0;">Tip: {{ m.supplier_tip }}</p>
+            {% if m.caution %}<p style="margin:2px 0 0;font-size:11px;color:#f59e0b;">&#x26A0; {{ m.caution }}</p>{% endif %}
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+      {% if s4.brand_mentions %}
+      <p style="margin:12px 0 8px;font-size:12px;color:#5a6577;font-weight:600;">브랜드 언급</p>
+      {% for b in s4.brand_mentions %}
+      <p style="margin:0 0 6px;font-size:12px;">
+        <span style="color:{% if b.sentiment == '긍정' %}#34d399{% elif b.sentiment == '부정' %}#ef4444{% else %}#6b7280{% endif %};font-weight:600;">{{ b.brand }}</span>
+        <span style="color:#5a6577;">({{ b.sentiment }})</span>
+        <span style="color:#7b8ca8;"> &mdash; {{ b.context }}</span>
+      </p>
+      {% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 5: Objection Map -->
+  {% set s5 = analysis.section5_objection_map %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F6E1;&#xFE0F; {{ s5.title }}</h2>
+      {% for o in s5.objections %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;background-color:#141420;border-radius:10px;border:1px solid #2a2a3a;">
+        <tr>
+          <td style="padding:16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td><span style="font-size:13px;color:#f59e0b;font-weight:600;">"{{ o.objection }}"</span></td>
+                <td style="text-align:right;"><span style="font-size:11px;color:#5a6577;">빈도: {{ o.frequency }}</span></td>
+              </tr>
+            </table>
+            <p style="margin:6px 0 4px;font-size:12px;color:#7b8ca8;">숨은 불안: {{ o.underlying_fear }}</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;background-color:#1a2030;border-radius:8px;">
+              <tr>
+                <td style="padding:10px 14px;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#4cc9f0;font-weight:600;">&#x1F4AC; 대응 스크립트</p>
+                  <p style="margin:0;font-size:12px;color:#c0cad8;line-height:1.6;">{{ o.counter_script }}</p>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:6px 0 0;font-size:11px;color:#5a6577;">증거: {{ o.proof_point }}</p>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+    </td>
+  </tr>
+
+  <!-- Section 6: Regional Signals -->
+  {% set s6 = analysis.section6_regional_signals %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F4CD; {{ s6.title }}</h2>
+      {% if s6.active_regions %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141420;border-radius:8px;overflow:hidden;">
+        <tr style="background-color:#1a1a2a;">
+          <td style="padding:8px 12px;font-size:11px;color:#5a6577;font-weight:700;">지역</td>
+          <td style="padding:8px 12px;font-size:11px;color:#5a6577;font-weight:700;">수요</td>
+          <td style="padding:8px 12px;font-size:11px;color:#5a6577;font-weight:700;text-align:center;">강도</td>
+        </tr>
+        {% for r in s6.active_regions %}
+        <tr>
+          <td style="padding:8px 12px;font-size:12px;color:#ffffff;border-top:1px solid #2a2a3a;">{{ r.region }}</td>
+          <td style="padding:8px 12px;font-size:12px;color:#a0aec0;border-top:1px solid #2a2a3a;">{{ r.demand_type }}</td>
+          <td style="padding:8px 12px;text-align:center;border-top:1px solid #2a2a3a;">
+            <span style="color:{% if r.signal_strength == '강함' %}#34d399{% elif r.signal_strength == '보통' %}#f59e0b{% else %}#6b7280{% endif %};font-size:11px;font-weight:600;">{{ r.signal_strength }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+      {% if s6.analyst_note %}
+      <p style="margin:8px 0 0;font-size:11px;color:#5a6577;font-style:italic;">{{ s6.analyst_note }}</p>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 7: Competitive Intelligence -->
+  {% set s7 = analysis.section7_competitive_intelligence %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F50D; {{ s7.title }}</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141420;border-radius:10px;">
+        <tr>
+          <td style="padding:16px;">
+            <p style="margin:0 0 8px;font-size:13px;color:#ffffff;font-weight:600;">DIY vs 업체 고용</p>
+            <p style="margin:0 0 4px;font-size:12px;color:#a0aec0;">DIY 성향: {{ s7.diy_vs_pro_balance.diy_leaning_ratio }} | 업체 의뢰 성향: {{ s7.diy_vs_pro_balance.pro_leaning_ratio }}</p>
+            <p style="margin:0 0 4px;font-size:12px;color:#7b8ca8;">전환 계기: {{ s7.diy_vs_pro_balance.swing_factors }}</p>
+            <p style="margin:0;font-size:12px;color:#4cc9f0;">&#x2192; {{ s7.diy_vs_pro_balance.business_action }}</p>
+          </td>
+        </tr>
+      </table>
+      {% if s7.negative_word_of_mouth %}
+      <p style="margin:12px 0 6px;font-size:12px;color:#ef4444;font-weight:600;">&#x26A0;&#xFE0F; 부정 입소문 주의</p>
+      {% for n in s7.negative_word_of_mouth %}
+      <p style="margin:0 0 6px;font-size:12px;color:#a0aec0;">{{ n.complaint_type }} ({{ n.frequency }}) &mdash; <span style="color:#4cc9f0;">{{ n.prevention_tip }}</span></p>
+      {% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 8: The One Action (가장 눈에 띄는 섹션) -->
+  {% set s8 = analysis.section8_weekly_action %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:linear-gradient(135deg,#4cc9f0 0%,#1e3a5f 100%);border-radius:14px;padding:28px;text-align:center;">
+            <p style="margin:0 0 6px;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:2px;font-weight:700;">&#x1F3AF; 오늘 단 하나의 액션</p>
+            <p style="margin:0 0 16px;font-size:18px;color:#ffffff;line-height:1.6;font-weight:700;">{{ s8.the_one_action.action }}</p>
+            <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,0.8);text-align:left;">&#x23F0; 왜 오늘? {{ s8.the_one_action.why_this_week }}</p>
+            <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,0.8);text-align:left;">&#x1F527; 실행법: {{ s8.the_one_action.how_to_execute }}</p>
+            <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,0.8);text-align:left;">&#x1F4C8; 기대결과: {{ s8.the_one_action.expected_outcome }}</p>
+            <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.6);text-align:left;">&#x23F1; 소요시간: {{ s8.the_one_action.time_required }}</p>
+          </td>
+        </tr>
+      </table>
+      {% if s8.bonus_quick_wins %}
+      <p style="margin:12px 0 6px;font-size:12px;color:#5a6577;font-weight:600;">&#x26A1; Quick Wins (30분 이내)</p>
+      {% for q in s8.bonus_quick_wins %}
+      <p style="margin:0 0 4px;font-size:12px;color:#a0aec0;">&#x2022; {{ q.action }} &mdash; <span style="color:#4cc9f0;">{{ q.impact }}</span></p>
+      {% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- Section 9: Forward Look -->
+  {% set s9 = analysis.section9_forward_look %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F52E; {{ s9.title }}</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#141420;border-radius:10px;">
+        <tr>
+          <td style="padding:16px;">
+            <p style="margin:0 0 8px;font-size:13px;color:#a0aec0;line-height:1.6;">{{ s9.next_week_demand_forecast }}</p>
+            {% if s9.seasonal_alert %}
+            <p style="margin:0 0 8px;font-size:12px;color:#f59e0b;">&#x1F321;&#xFE0F; 계절 알림: {{ s9.seasonal_alert }}</p>
+            {% endif %}
+            {% if s9.prepare_now %}
+            <p style="margin:8px 0 4px;font-size:12px;color:#5a6577;font-weight:600;">지금 준비할 것:</p>
+            {% for prep in s9.prepare_now %}
+            <p style="margin:0 0 3px;font-size:12px;color:#c0cad8;">&#x2022; {{ prep }}</p>
+            {% endfor %}
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Section 10: Raw Insights -->
+  {% set s10 = analysis.section10_raw_insights %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 14px;font-size:16px;color:#ffffff;">&#x1F5E3;&#xFE0F; {{ s10.title }}</h2>
+      {% for q in s10.notable_quotes %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+        <tr>
+          <td style="border-left:3px solid #4cc9f0;padding:8px 16px;background-color:#141420;border-radius:0 8px 8px 0;">
+            <p style="margin:0 0 4px;font-size:13px;color:#c0cad8;font-style:italic;line-height:1.5;">"{{ q.quote_summary }}"</p>
+            <p style="margin:0;font-size:11px;color:#5a6577;">{{ q.why_notable }} <span style="color:#4cc9f0;">| {{ q.source_type }}</span></p>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+    </td>
+  </tr>
+
+  <!-- 푸터 -->
+  <tr>
+    <td style="background-color:#12121a;padding:24px 40px;border-top:1px solid #2a2a3a;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="text-align:center;">
+            <p style="margin:0 0 6px;font-size:12px;color:#3a3a4a;">데이터 소스: 네이버 카페 '셀프인테리어' | {{ analysis.meta.total_posts_analyzed }}개 게시글 분석</p>
+            <p style="margin:0 0 6px;font-size:11px;color:#3a3a4a;">본 리포트는 공개 커뮤니티 데이터를 기반으로 AI가 분석한 결과이며, 투자/경영 의사결정의 유일한 근거로 사용하지 마세요.</p>
+            <p style="margin:0 0 12px;font-size:11px;color:#3a3a4a;">&copy; 인테리어 인사이트 데일리</p>
+            <a href="{{ unsubscribe_url }}" style="font-size:11px;color:#3a3a4a;text-decoration:underline;">수신 거부</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인테리어 인사이트 데일리</title>
+</head>
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#1a1a1a;">
+
+<!-- 콘텐츠 바로 시작 -->
+<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;background-color:#ffffff;">
+
+  <!-- 헤더 -->
+  <tr>
+    <td style="background-color:#f8f9fa;padding:28px 24px;border-bottom:2px solid #e9ecef;">
+      <p style="margin:0 0 4px;font-size:11px;color:#1971c2;letter-spacing:2px;font-weight:700;">DAILY BUSINESS INTELLIGENCE</p>
+      <h1 style="margin:0 0 6px;font-size:22px;color:#1a1a1a;font-weight:700;">인테리어 인사이트 데일리</h1>
+      <p style="margin:0;font-size:13px;color:#868e96;">{{ report_date }} &middot; {{ meta.total_posts }}개 게시글 분석</p>
+    </td>
+  </tr>
+
+  <!-- ================================================================ -->
+  <!-- SECTION 1: 핫 키워드 TOP 10 -->
+  <!-- ================================================================ -->
+  {% set s1 = analysis.section1_hot_keywords %}
+  <tr>
+    <td style="padding:28px 24px 12px;">
+      <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;font-weight:700;">{{ s1.title }}</h2>
+      <p style="margin:0 0 20px;font-size:12px;color:#868e96;">{{ s1.description }}</p>
+    </td>
+  </tr>
+
+  {% set max_count = s1.keywords[0].mention_count | int if s1.keywords else 1 %}
+  {% for kw in s1.keywords %}
+  <tr>
+    <td style="padding:0 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:2px;">
+        <tr>
+          <td style="padding:6px 0 2px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="28" style="vertical-align:middle;">
+                  <span style="display:inline-block;width:22px;height:22px;background-color:{% if loop.index <= 3 %}#1971c2{% else %}#dee2e6{% endif %};border-radius:50%;text-align:center;line-height:22px;font-size:11px;color:{% if loop.index <= 3 %}#ffffff{% else %}#495057{% endif %};font-weight:700;">{{ kw.rank }}</span>
+                </td>
+                <td style="font-size:14px;color:#1a1a1a;font-weight:{% if loop.index <= 3 %}700{% else %}500{% endif %};padding-left:8px;">
+                  {{ kw.keyword }} <span style="font-size:12px;color:#868e96;font-weight:400;">{{ kw.mention_count }}회</span>
+                </td>
+                <td width="70" style="text-align:right;font-size:14px;">{{ kw.heat }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- 바 차트 -->
+        <tr>
+          <td style="padding:0 0 2px 36px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background-color:#e9ecef;border-radius:4px;height:8px;padding:0;">
+                  <table role="presentation" width="{{ ((kw.mention_count | int) / (max_count | int) * 100) | int }}%" cellpadding="0" cellspacing="0" style="height:8px;">
+                    <tr>
+                      <td style="background:linear-gradient(90deg,#1971c2,{% if loop.index <= 3 %}#0ca678{% else %}#74c0fc{% endif %});border-radius:4px;height:8px;"></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:2px 0 12px 36px;">
+            <p style="margin:0 0 1px;font-size:12px;color:#495057;">{{ kw.why_hot }}</p>
+            <p style="margin:0;font-size:12px;color:#1971c2;">&#x2192; {{ kw.business_read }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endfor %}
+
+  <!-- 구분선 -->
+  <tr><td style="padding:4px 24px;"><hr style="border:none;border-top:1px solid #e9ecef;margin:0;"></td></tr>
+
+  <!-- ================================================================ -->
+  <!-- SECTION 2: 소비자가 궁금해하는 것 -->
+  <!-- ================================================================ -->
+  {% set s2 = analysis.section2_consumer_questions %}
+  <tr>
+    <td style="padding:24px 24px 12px;">
+      <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;font-weight:700;">{{ s2.title }}</h2>
+      <p style="margin:0 0 16px;font-size:12px;color:#868e96;">{{ s2.description }}</p>
+    </td>
+  </tr>
+
+  {% for q in s2.questions %}
+  <tr>
+    <td style="padding:0 24px 14px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;border-radius:10px;border:1px solid #e9ecef;">
+        <tr>
+          <td style="padding:18px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="26" style="vertical-align:top;">
+                  <span style="display:inline-block;width:22px;height:22px;background-color:#fff3bf;border-radius:50%;text-align:center;line-height:22px;font-size:12px;color:#e67700;font-weight:700;">Q</span>
+                </td>
+                <td style="padding-left:8px;">
+                  <p style="margin:0 0 4px;font-size:14px;color:#1a1a1a;font-weight:600;line-height:1.5;">"{{ q.question }}"</p>
+                  <p style="margin:0 0 10px;font-size:11px;color:#868e96;">빈도: {{ q.frequency }} &middot; {{ q.example_post }}</p>
+                </td>
+              </tr>
+            </table>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;border:1px solid #e9ecef;">
+              <tr>
+                <td style="padding:12px 14px;">
+                  <p style="margin:0 0 2px;font-size:10px;color:#1971c2;letter-spacing:1px;font-weight:700;">EXPERT ANSWER</p>
+                  <p style="margin:0 0 8px;font-size:12px;color:#343a40;line-height:1.6;">{{ q.expert_answer_hint }}</p>
+                  <p style="margin:0;font-size:11px;color:#0ca678;">&#x1F4B0; 세일즈: {{ q.sales_angle }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endfor %}
+
+  <tr><td style="padding:4px 24px;"><hr style="border:none;border-top:1px solid #e9ecef;margin:0;"></td></tr>
+
+  <!-- ================================================================ -->
+  <!-- SECTION 3: 소비자가 원하는 것 -->
+  <!-- ================================================================ -->
+  {% set s3 = analysis.section3_consumer_wants %}
+  <tr>
+    <td style="padding:24px 24px 12px;">
+      <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;font-weight:700;">{{ s3.title }}</h2>
+      <p style="margin:0 0 16px;font-size:12px;color:#868e96;">{{ s3.description }}</p>
+    </td>
+  </tr>
+
+  {% for w in s3.wants %}
+  <tr>
+    <td style="padding:0 24px 14px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;border-radius:10px;border:1px solid #e9ecef;">
+        <tr>
+          <td style="padding:18px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <span style="display:inline-block;background-color:{% if w.intensity == '강함' %}#ffe3e3{% else %}#fff3bf{% endif %};color:{% if w.intensity == '강함' %}#c92a2a{% else %}#e67700{% endif %};padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;">{{ w.intensity }}</span>
+                  <span style="margin-left:6px;font-size:14px;color:#1a1a1a;font-weight:600;">{{ w.want }}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:8px 0 10px;font-size:12px;color:#495057;line-height:1.5;">{{ w.evidence }}</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="50%" style="vertical-align:top;padding-right:6px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#e7f5ff;border-radius:8px;">
+                    <tr>
+                      <td style="padding:10px 12px;">
+                        <p style="margin:0 0 2px;font-size:10px;color:#1971c2;letter-spacing:1px;font-weight:700;">SELLING POINT</p>
+                        <p style="margin:0;font-size:11px;color:#343a40;line-height:1.5;">{{ w.how_to_sell }}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td width="50%" style="vertical-align:top;padding-left:6px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#e6fcf5;border-radius:8px;">
+                    <tr>
+                      <td style="padding:10px 12px;">
+                        <p style="margin:0 0 2px;font-size:10px;color:#0ca678;letter-spacing:1px;font-weight:700;">PACKAGE IDEA</p>
+                        <p style="margin:0;font-size:11px;color:#343a40;line-height:1.5;">{{ w.package_idea }}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endfor %}
+
+  <tr><td style="padding:4px 24px;"><hr style="border:none;border-top:1px solid #e9ecef;margin:0;"></td></tr>
+
+  <!-- ================================================================ -->
+  <!-- SECTION 4: 오늘의 액션 한 줄 -->
+  <!-- ================================================================ -->
+  {% set s4 = analysis.section4_one_action %}
+  <tr>
+    <td style="padding:24px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:linear-gradient(135deg,#1971c2 0%,#0ca678 100%);border-radius:12px;padding:24px;text-align:center;">
+            <p style="margin:0 0 6px;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:2px;font-weight:700;">TODAY'S ONE ACTION</p>
+            <p style="margin:0 0 14px;font-size:17px;color:#ffffff;line-height:1.6;font-weight:700;">{{ s4.action }}</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:rgba(255,255,255,0.15);border-radius:8px;">
+              <tr>
+                <td style="padding:12px 16px;text-align:left;">
+                  <p style="margin:0 0 4px;font-size:12px;color:rgba(255,255,255,0.9);"><strong>WHY:</strong> {{ s4.why }}</p>
+                  <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.9);"><strong>HOW:</strong> {{ s4.how }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr><td style="padding:4px 24px;"><hr style="border:none;border-top:1px solid #e9ecef;margin:0;"></td></tr>
+
+  <!-- ================================================================ -->
+  <!-- SECTION 5: 소비자 생목소리 -->
+  <!-- ================================================================ -->
+  {% set s5 = analysis.section5_raw_voices %}
+  <tr>
+    <td style="padding:24px 24px 12px;">
+      <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;font-weight:700;">{{ s5.title }}</h2>
+      <p style="margin:0 0 16px;font-size:12px;color:#868e96;">{{ s5.description }}</p>
+    </td>
+  </tr>
+
+  {% for v in s5.voices %}
+  <tr>
+    <td style="padding:0 24px 10px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="border-left:3px solid {% if loop.index <= 2 %}#1971c2{% elif loop.index <= 4 %}#e67700{% else %}#adb5bd{% endif %};padding:10px 14px;background-color:#f8f9fa;border-radius:0 8px 8px 0;">
+            <p style="margin:0 0 4px;font-size:13px;color:#1a1a1a;line-height:1.6;font-style:italic;">"{{ v.quote }}"</p>
+            <p style="margin:0 0 3px;font-size:11px;color:#868e96;">{{ v.context }}</p>
+            <p style="margin:0;font-size:11px;color:#1971c2;">&#x1F4A1; {{ v.takeaway }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endfor %}
+
+  <!-- 푸터 -->
+  <tr>
+    <td style="padding:24px 24px;border-top:1px solid #e9ecef;">
+      <p style="margin:0 0 4px;font-size:11px;color:#adb5bd;">네이버 '셀프인테리어' 카페 {{ meta.total_posts }}개 게시글 기반 AI 분석</p>
+      <p style="margin:0 0 8px;font-size:10px;color:#ced4da;">본 리포트는 참고용이며 의사결정의 유일한 근거로 사용하지 마세요 &middot; &copy; 인테리어 인사이트 데일리</p>
+      <a href="{{ unsubscribe_url }}" style="font-size:10px;color:#ced4da;text-decoration:underline;">수신 거부</a>
+    </td>
+  </tr>
+
+</table>
+</body>
+</html>

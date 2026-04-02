@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인테리어 인사이트 위클리</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;">
+
+<!-- 전체 컨테이너 -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7;">
+<tr><td align="center" style="padding:20px 10px;">
+
+<!-- 메인 카드 -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+  <!-- 헤더 -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);padding:32px 40px;text-align:center;">
+      <p style="margin:0 0 8px;font-size:13px;color:#4f86c6;letter-spacing:2px;text-transform:uppercase;">WEEKLY INSIGHT REPORT</p>
+      <h1 style="margin:0 0 12px;font-size:26px;color:#ffffff;font-weight:700;">인테리어 인사이트 위클리</h1>
+      <p style="margin:0;font-size:14px;color:#8b9dc3;">{{ week_start }} ~ {{ week_end }}</p>
+    </td>
+  </tr>
+
+  <!-- 인사 -->
+  <tr>
+    <td style="padding:28px 40px 0;">
+      <p style="margin:0;font-size:15px;color:#333;">안녕하세요{% if subscriber_name %}, <strong>{{ subscriber_name }}</strong>님{% endif %}! 이번 주 인테리어 업계 인사이트를 정리했습니다.</p>
+    </td>
+  </tr>
+
+  <!-- Executive Summary -->
+  <tr>
+    <td style="padding:24px 40px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background-color:#f0f4ff;border-left:4px solid #4f86c6;border-radius:0 8px 8px 0;padding:20px 24px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#4f86c6;font-weight:700;letter-spacing:1px;">📋 EXECUTIVE SUMMARY</p>
+            <p style="margin:0;font-size:15px;color:#1a1a2e;line-height:1.7;">{{ analysis.executive_summary }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- 핫 키워드 -->
+  {% if analysis.hot_keywords %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 16px;font-size:18px;color:#1a1a2e;">🔥 이번 주 핫 키워드</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        {% for kw in analysis.hot_keywords %}
+        <tr>
+          <td style="padding:10px 16px;{% if not loop.last %}border-bottom:1px solid #eee;{% endif %}">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="60%">
+                  <span style="display:inline-block;background-color:#e8f0fe;color:#1a56db;padding:4px 12px;border-radius:20px;font-size:14px;font-weight:600;">{{ kw.keyword }}</span>
+                  <span style="margin-left:8px;font-size:14px;color:{% if kw.trend == '상승' %}#10b981{% elif kw.trend == '하락' %}#ef4444{% else %}#6b7280{% endif %};">
+                    {% if kw.trend == '상승' %}↑{% elif kw.trend == '하락' %}↓{% else %}→{% endif %} {{ kw.trend }}
+                  </span>
+                </td>
+                <td width="40%" style="text-align:right;font-size:13px;color:#6b7280;">{{ kw.count }}회 언급</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-top:6px;font-size:13px;color:#555;line-height:1.5;">💡 {{ kw.insight }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 스타일 트렌드 -->
+  {% if analysis.style_trends %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 16px;font-size:18px;color:#1a1a2e;">🎨 주목할 스타일 트렌드</h2>
+      {% for trend in analysis.style_trends %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+        <tr>
+          <td style="padding:16px;">
+            <p style="margin:0 0 6px;font-size:16px;font-weight:700;color:#1a1a2e;">{{ trend.style }}</p>
+            <p style="margin:0 0 10px;font-size:14px;color:#555;line-height:1.6;">{{ trend.description }}</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background-color:#fef9ee;border-radius:6px;padding:10px 14px;">
+                  <p style="margin:0;font-size:13px;color:#92400e;">💼 <strong>영업 기회:</strong> {{ trend.business_opportunity }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 소비자 페인포인트 -->
+  {% if analysis.pain_points %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 16px;font-size:18px;color:#1a1a2e;">⚠️ 소비자 페인포인트</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+        <tr style="background-color:#f9fafb;">
+          <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#6b7280;width:35%;">이슈</td>
+          <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#6b7280;width:15%;text-align:center;">빈도</td>
+          <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#6b7280;width:50%;">권장 대응</td>
+        </tr>
+        {% for pp in analysis.pain_points %}
+        <tr>
+          <td style="padding:12px 14px;font-size:13px;color:#333;border-top:1px solid #e5e7eb;">{{ pp.issue }}</td>
+          <td style="padding:12px 14px;text-align:center;border-top:1px solid #e5e7eb;">
+            <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;
+              {% if pp.frequency == '높음' %}background-color:#fee2e2;color:#dc2626;
+              {% elif pp.frequency == '중간' %}background-color:#fef3c7;color:#d97706;
+              {% else %}background-color:#e0f2fe;color:#0284c7;{% endif %}">
+              {{ pp.frequency }}
+            </span>
+          </td>
+          <td style="padding:12px 14px;font-size:13px;color:#555;border-top:1px solid #e5e7eb;">{{ pp.recommended_action }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 자재/브랜드 언급 -->
+  {% if analysis.material_brand_mentions %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <h2 style="margin:0 0 16px;font-size:18px;color:#1a1a2e;">🏷️ 자재·브랜드 언급 순위</h2>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        {% for mb in analysis.material_brand_mentions %}
+        <tr>
+          <td style="padding:8px 0;{% if not loop.last %}border-bottom:1px solid #f3f4f6;{% endif %}">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="8%" style="font-size:16px;font-weight:700;color:#4f86c6;">{{ loop.index }}</td>
+                <td width="52%" style="font-size:14px;color:#333;font-weight:600;">{{ mb.name }}</td>
+                <td width="20%" style="font-size:13px;color:#6b7280;text-align:center;">{{ mb.mention_count }}회</td>
+                <td width="20%" style="text-align:right;">
+                  <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;
+                    {% if mb.sentiment == '긍정' %}background-color:#d1fae5;color:#059669;
+                    {% elif mb.sentiment == '부정' %}background-color:#fee2e2;color:#dc2626;
+                    {% else %}background-color:#f3f4f6;color:#6b7280;{% endif %}">
+                    {{ mb.sentiment }}
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 이번 주 영업 기회 (가장 눈에 띄는 섹션) -->
+  {% if analysis.weekly_opportunity %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:linear-gradient(135deg,#4f86c6 0%,#3b6fa0 100%);border-radius:12px;padding:28px;text-align:center;">
+            <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,0.8);letter-spacing:1px;">💡 이번 주 영업 기회</p>
+            <p style="margin:0;font-size:17px;color:#ffffff;line-height:1.7;font-weight:600;">{{ analysis.weekly_opportunity }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 다음 주 예측 -->
+  {% if analysis.next_week_prediction %}
+  <tr>
+    <td style="padding:0 40px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background-color:#f9fafb;border-radius:8px;padding:18px 22px;">
+            <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#1a1a2e;">📈 다음 주 예측</p>
+            <p style="margin:0;font-size:14px;color:#555;line-height:1.6;">{{ analysis.next_week_prediction }}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- 푸터 -->
+  <tr>
+    <td style="background-color:#f9fafb;padding:24px 40px;border-top:1px solid #e5e7eb;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="text-align:center;">
+            {% if analysis.data_stats %}
+            <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">분석 데이터: {{ analysis.data_stats.total_posts }}개 게시글 | {{ analysis.data_stats.date_range }}</p>
+            {% endif %}
+            <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">본 리포트는 네이버 커뮤니티 공개 데이터를 기반으로 AI가 분석한 결과입니다.</p>
+            <p style="margin:0 0 16px;font-size:12px;color:#9ca3af;">© 인테리어 인사이트 위클리</p>
+            <a href="{{ unsubscribe_url }}" style="font-size:12px;color:#9ca3af;text-decoration:underline;">수신 거부</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+<!-- /메인 카드 -->
+
+</td></tr>
+</table>
+<!-- /전체 컨테이너 -->
+
+</body>
+</html>

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인테리어 인사이트 데일리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F5F3EF;
+    --bg-card: #EDEAE4;
+    --olive: #3D4A3C;
+    --olive-light: #4A5A49;
+    --charcoal: #2C2C2C;
+    --text: #3A3A3A;
+    --text-sub: #7A7A72;
+    --accent: #3D4A3C;
+    --white: #FFFFFF;
+    --border: #D5D0C8;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* 유틸리티 */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 32px; }
+  .fade-in {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── 네비게이션 ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(245, 243, 239, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100; border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: 780px; margin: 0 auto; padding: 16px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  nav .logo {
+    font-family: var(--serif); font-size: 16px; font-weight: 600;
+    color: var(--charcoal); letter-spacing: -0.5px;
+  }
+  nav .cta-nav {
+    font-size: 12px; font-weight: 600; color: var(--white);
+    background: var(--olive); padding: 8px 20px; border-radius: 4px;
+    text-decoration: none; letter-spacing: 0.5px;
+    transition: background 0.2s;
+  }
+  nav .cta-nav:hover { background: var(--olive-light); }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 160px 0 100px; text-align: center;
+  }
+  .hero .overline {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-sub); font-weight: 500; margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: var(--serif); font-size: 44px; font-weight: 700;
+    color: var(--charcoal); line-height: 1.3; margin-bottom: 24px;
+    letter-spacing: -1px;
+  }
+  .hero .sub {
+    font-size: 16px; line-height: 1.8; color: var(--text-sub);
+    font-weight: 300; max-width: 520px; margin: 0 auto 40px;
+  }
+  .hero .cta-hero {
+    display: inline-block; background: var(--olive); color: var(--white);
+    font-size: 14px; font-weight: 600; padding: 16px 48px;
+    text-decoration: none; letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .hero .cta-hero:hover {
+    background: var(--olive-light); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(61,74,60,0.15);
+  }
+  .hero .cta-sub {
+    display: block; margin-top: 14px;
+    font-size: 12px; color: var(--text-sub);
+  }
+
+  /* ── 신뢰 지표 ── */
+  .trust {
+    padding: 48px 0; border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .trust .inner-t {
+    display: flex; justify-content: center; gap: 60px;
+    text-align: center;
+  }
+  .trust .stat-num {
+    font-family: var(--serif); font-size: 28px; font-weight: 600;
+    color: var(--charcoal);
+  }
+  .trust .stat-label {
+    font-size: 12px; color: var(--text-sub); margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Problem ── */
+  .problem { padding: 100px 0; }
+  .section-overline {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--olive); font-weight: 600; margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: var(--serif); font-size: 32px; font-weight: 600;
+    color: var(--charcoal); line-height: 1.4; margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .section-desc {
+    font-size: 15px; line-height: 1.9; color: var(--text-sub);
+    font-weight: 300;
+  }
+  .problem-list { margin-top: 40px; }
+  .problem-item {
+    padding: 24px 0; border-bottom: 1px solid var(--border);
+    display: flex; gap: 20px; align-items: baseline;
+  }
+  .problem-num {
+    font-family: var(--serif); font-size: 24px; color: var(--border);
+    font-weight: 600; flex-shrink: 0; width: 32px;
+  }
+  .problem-text { font-size: 15px; line-height: 1.7; color: var(--text); }
+
+  /* ── Insight Preview ── */
+  .preview { padding: 100px 0; }
+  .preview-cards { margin-top: 40px; }
+  .preview-card {
+    background: var(--white); border: 1px solid var(--border);
+    padding: 32px; margin-bottom: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .preview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+  .preview-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--olive); font-weight: 600; margin-bottom: 12px;
+  }
+  .preview-headline {
+    font-family: var(--serif); font-size: 20px; font-weight: 600;
+    color: var(--charcoal); margin-bottom: 10px; line-height: 1.4;
+  }
+  .preview-body {
+    font-size: 14px; line-height: 1.7; color: var(--text-sub); font-weight: 300;
+  }
+
+  /* ── 키워드 바 차트 ── */
+  .keyword-section { padding: 100px 0; }
+  .keyword-bar-wrap { margin-top: 40px; }
+  .keyword-row {
+    display: flex; align-items: center; margin-bottom: 14px; gap: 12px;
+  }
+  .keyword-rank {
+    font-family: var(--serif); font-size: 14px; color: var(--border);
+    width: 24px; text-align: right; flex-shrink: 0;
+  }
+  .keyword-name {
+    font-size: 14px; font-weight: 600; color: var(--charcoal);
+    width: 150px; flex-shrink: 0; white-space: nowrap;
+  }
+  .keyword-bar-bg {
+    flex: 1; height: 6px; background: var(--bg-card); border-radius: 3px;
+    overflow: hidden;
+  }
+  .keyword-bar {
+    height: 100%; background: var(--olive); border-radius: 3px;
+    transition: width 1s ease;
+  }
+  .keyword-count {
+    font-size: 12px; color: var(--text-sub); width: 40px; text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── 혜택 ── */
+  .benefits { padding: 100px 0; }
+  .benefit-item {
+    padding: 32px 0; border-bottom: 1px solid var(--border);
+  }
+  .benefit-item:first-child { border-top: 1px solid var(--border); }
+  .benefit-title {
+    font-family: var(--serif); font-size: 20px; font-weight: 600;
+    color: var(--charcoal); margin-bottom: 8px;
+  }
+  .benefit-desc {
+    font-size: 14px; line-height: 1.7; color: var(--text-sub); font-weight: 300;
+  }
+
+  /* ── Pricing ── */
+  .pricing { padding: 100px 0; text-align: center; }
+  .price-card {
+    background: var(--white); border: 1px solid var(--border);
+    max-width: 420px; margin: 40px auto 0; padding: 48px 40px;
+  }
+  .price-label {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--olive); font-weight: 600; margin-bottom: 16px;
+  }
+  .price-amount {
+    font-family: var(--serif); font-size: 48px; font-weight: 700;
+    color: var(--charcoal);
+  }
+  .price-amount small {
+    font-size: 16px; font-weight: 400; color: var(--text-sub);
+  }
+  .price-features {
+    list-style: none; margin: 28px 0; text-align: left;
+  }
+  .price-features li {
+    padding: 10px 0; border-bottom: 1px solid var(--bg);
+    font-size: 14px; color: var(--text); font-weight: 300;
+  }
+  .price-features li::before {
+    content: "— "; color: var(--olive); font-weight: 600;
+  }
+  .cta-price {
+    display: block; width: 100%; padding: 16px;
+    background: var(--olive); color: var(--white);
+    font-size: 14px; font-weight: 600; border: none;
+    cursor: pointer; letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+  .cta-price:hover {
+    background: var(--olive-light);
+    box-shadow: 0 8px 24px rgba(61,74,60,0.15);
+  }
+
+  /* ── 추천사 ── */
+  .testimonials { padding: 100px 0; }
+  .testimonial-item {
+    padding: 40px 0; border-bottom: 1px solid var(--border);
+  }
+  .testimonial-item:first-of-type { border-top: 1px solid var(--border); }
+  .testimonial-quote {
+    font-family: var(--serif); font-size: 20px; font-weight: 400;
+    color: var(--charcoal); line-height: 1.6; font-style: italic;
+    margin-bottom: 16px;
+  }
+  .testimonial-author {
+    font-size: 13px; color: var(--text-sub); font-weight: 500;
+  }
+
+  /* ── FAQ ── */
+  .faq { padding: 100px 0; }
+  .faq-item {
+    padding: 24px 0; border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-q {
+    font-size: 15px; font-weight: 600; color: var(--charcoal);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq-q::after { content: "+"; font-size: 18px; color: var(--text-sub); }
+  .faq-item.open .faq-q::after { content: "−"; }
+  .faq-a {
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+    font-size: 14px; line-height: 1.7; color: var(--text-sub); font-weight: 300;
+  }
+  .faq-item.open .faq-a { max-height: 200px; padding-top: 12px; }
+
+  /* ── Final CTA ── */
+  .final-cta {
+    padding: 100px 0; text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .final-cta h2 {
+    font-family: var(--serif); font-size: 36px; font-weight: 600;
+    color: var(--charcoal); margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .final-cta p {
+    font-size: 15px; color: var(--text-sub); font-weight: 300;
+    margin-bottom: 36px;
+  }
+
+  /* ── 구독 모달 ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    justify-content: center; align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white); padding: 48px 40px; width: 400px;
+    max-width: 90vw; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 20px;
+    font-size: 20px; color: var(--text-sub); cursor: pointer;
+    background: none; border: none;
+  }
+  .modal h3 {
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+    color: var(--charcoal); margin-bottom: 24px;
+  }
+  .modal .form-group { margin-bottom: 16px; }
+  .modal label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 4px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .modal input {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--border);
+    font-size: 14px; font-family: var(--sans);
+    background: var(--bg); outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal input:focus { border-color: var(--olive); }
+  .modal .btn-submit {
+    width: 100%; padding: 14px; background: var(--olive);
+    color: var(--white); border: none; font-size: 14px;
+    font-weight: 600; cursor: pointer; letter-spacing: 1px;
+    margin-top: 8px; transition: background 0.2s;
+  }
+  .modal .btn-submit:hover { background: var(--olive-light); }
+  .modal .note {
+    font-size: 11px; color: var(--text-sub); text-align: center;
+    margin-top: 12px; line-height: 1.5;
+  }
+  .result-message {
+    padding: 12px; text-align: center; font-size: 13px;
+    margin-top: 12px; display: none;
+  }
+  .result-message.success { background: #e6fcf5; color: #0ca678; display: block; }
+  .result-message.error { background: #ffe3e3; color: #c92a2a; display: block; }
+
+  /* ── 푸터 ── */
+  footer {
+    padding: 40px 0; text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  footer p { font-size: 11px; color: var(--border); line-height: 1.8; }
+
+  /* 반응형 */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 30px; }
+    .hero { padding: 120px 0 60px; }
+    .section-title { font-size: 26px; }
+    .trust .inner-t { gap: 32px; }
+    .trust .stat-num { font-size: 22px; }
+    .price-amount { font-size: 36px; }
+    .preview-card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="inner">
+    <div class="logo">Interior Insight</div>
+    <a href="#pricing" class="cta-nav">구독하기</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero container fade-in">
+  <p class="overline">Daily Business Intelligence<br>for Interior Professionals</p>
+  <h1>시장을 읽는 업체만<br>살아남습니다</h1>
+  <p class="sub">
+    매일 700건 이상의 소비자 대화와<br>
+    26개 인테리어 전문 유튜브 채널을 AI가 분석합니다.<br>
+    오늘 고객이 무엇을 원하는지, 업계가 무엇을 밀고 있는지.<br>
+    매일 아침 7시, 당신의 메일함에 도착합니다.
+  </p>
+  <a href="#pricing" class="cta-hero">단 돈 263.3원으로 시작하기</a>
+  <span class="cta-sub">런칭 기념 특별가 &middot; 언제든 해지 가능</span>
+</section>
+
+<!-- 신뢰 지표 -->
+<section class="trust fade-in">
+  <div class="inner-t container">
+    <div>
+      <div class="stat-num">700+</div>
+      <div class="stat-label">일일 카페 게시글 분석</div>
+    </div>
+    <div>
+      <div class="stat-num">26</div>
+      <div class="stat-label">유튜브 전문 채널 추적</div>
+    </div>
+    <div>
+      <div class="stat-num">07:00</div>
+      <div class="stat-label">매일 아침 발송</div>
+    </div>
+  </div>
+</section>
+
+<!-- Problem -->
+<section class="problem container fade-in">
+  <p class="section-overline">The Problem</p>
+  <h2 class="section-title">인테리어 시장 정보,<br>아직도 감으로 하십니까</h2>
+  <p class="section-desc">
+    매일 수백 건의 소비자 대화가 커뮤니티에 쏟아집니다.<br>
+    그 안에 당신의 다음 계약이 숨어 있습니다.
+  </p>
+  <div class="problem-list">
+    <div class="problem-item">
+      <span class="problem-num">01</span>
+      <span class="problem-text">고객이 요즘 뭘 원하는지 모릅니다. 상담 때마다 감으로 대응합니다.</span>
+    </div>
+    <div class="problem-item">
+      <span class="problem-num">02</span>
+      <span class="problem-text">경쟁 업체는 이미 트렌드를 읽고 제안서를 바꿨습니다. 나만 모릅니다.</span>
+    </div>
+    <div class="problem-item">
+      <span class="problem-num">03</span>
+      <span class="problem-text">커뮤니티를 직접 볼 시간이 없습니다. 현장과 영업만으로도 하루가 부족합니다.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 키워드 바 차트 -->
+<section class="keyword-section container fade-in">
+  <p class="section-overline">Today's Hot Keywords</p>
+  <h2 class="section-title">오늘, 업계에서<br>가장 주목받는 제품</h2>
+  <p class="section-desc">커뮤니티와 유튜브에서 가장 많이 언급되는 구체적 제품 시그널을 매일 추적합니다.</p>
+  <div class="keyword-bar-wrap">
+    <div class="keyword-row"><span class="keyword-rank">1</span><span class="keyword-name">디아망 회크화</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:100%"></div></div><span class="keyword-count">벽지</span></div>
+    <div class="keyword-row"><span class="keyword-rank">2</span><span class="keyword-name">에디톤 솔티크림</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:85%"></div></div><span class="keyword-count">마루</span></div>
+    <div class="keyword-row"><span class="keyword-rank">3</span><span class="keyword-name">한솔 조슈아라이트</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:75%"></div></div><span class="keyword-count">필름</span></div>
+    <div class="keyword-row"><span class="keyword-rank">4</span><span class="keyword-name">예림 스노우베이지</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:65%"></div></div><span class="keyword-count">필름</span></div>
+    <div class="keyword-row"><span class="keyword-rank">5</span><span class="keyword-name">로슬러 노블리프</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:55%"></div></div><span class="keyword-count">실링팬</span></div>
+    <div class="keyword-row"><span class="keyword-rank">6</span><span class="keyword-name">베코보노 스위치</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:45%"></div></div><span class="keyword-count">전기</span></div>
+    <div class="keyword-row"><span class="keyword-rank">7</span><span class="keyword-name">동화 이모션블랑</span><div class="keyword-bar-bg"><div class="keyword-bar" style="width:40%"></div></div><span class="keyword-count">마루</span></div>
+  </div>
+</section>
+
+<!-- Insight Preview -->
+<section class="preview container fade-in">
+  <p class="section-overline">Insight Preview</p>
+  <h2 class="section-title">매일 받아보시는<br>인사이트의 일부입니다</h2>
+  <div class="preview-cards">
+    <div class="preview-card">
+      <div class="preview-label">Product Signal</div>
+      <div class="preview-headline">한솔 조슈아라이트 — 중동 전쟁 여파로 생산 중단 위기</div>
+      <div class="preview-body">원자재 수급 문제로 생산이 어려워지고 있어 대체재 확보가 시급합니다. 비슷한 색감의 예림 제품군으로 고객을 안내하고, 재고가 있는 동안 선주문을 받아 고객 이탈을 방지하십시오.</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-label">Product Battle</div>
+      <div class="preview-headline">디아망 회크화 vs 크렉스톤 — 프리미엄 벽지 대결</div>
+      <div class="preview-body">디아망이 압도적 선호도를 보이지만 크렉스톤도 대안으로 부상 중입니다. 시공 후 내구성, 색감 일관성 등 기술적 우위를 구체적 데이터로 제시하십시오.</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-label">Price Intelligence</div>
+      <div class="preview-headline">27평 턴키 4,000만원 중반 — 서울 기준 적정가 평가</div>
+      <div class="preview-body">자재 인상 전 막차라는 소비자 인식이 확산 중이며, 현재는 6,000~7,000만원으로 예상된다는 댓글이 다수 확인되었습니다.</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-label">Risk Signal</div>
+      <div class="preview-headline">입주청소 불량 서비스 — 소비자 피해 사례 급증</div>
+      <div class="preview-body">허위 광고와 불량 서비스로 인한 소비자 분쟁이 고인게이지먼트 게시글에서 다수 확인되었습니다. 투명한 가격 정책과 사후 AS 체계를 구축하십시오.</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-label">Market Signal</div>
+      <div class="preview-headline">중동 전쟁發 자재 수급 위기 — 본드·실리콘 생산 차질</div>
+      <div class="preview-body">나프타 부족으로 벽지 부자재 수급이 어려워지고 있으며, 가격 인상 압박이 확대되고 있습니다. 핵심 자재의 사전 재고 확보를 권장합니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 혜택 -->
+<section class="benefits container fade-in">
+  <p class="section-overline">What You Get</p>
+  <h2 class="section-title">구독하시면<br>매일 아침 받아보십니다</h2>
+  <div class="benefit-item">
+    <div class="benefit-title">오늘의 제품/자재 시그널 TOP 10</div>
+    <div class="benefit-desc">'바닥', '조명' 같은 뻔한 카테고리가 아닙니다. 디아망 회크화, 에디톤 솔티크림, 한솔 조슈아라이트처럼 소비자가 실제로 입에 올린 구체적 제품명·모델명을 추출합니다. 각 제품이 왜 지금 뜨고 있는지, 업체가 어떻게 대응해야 하는지까지 2~3줄의 실무 인사이트를 함께 제공합니다.</div>
+  </div>
+  <div class="benefit-item">
+    <div class="benefit-title">제품 비교 분석</div>
+    <div class="benefit-desc">소비자는 항상 비교합니다. 디아망 회크화 vs 크렉스톤, 한솔 조슈아라이트 vs 예림 던오크 — 지금 커뮤니티에서 어떤 제품이 저울질되고 있는지, 어느 쪽이 우세한지, 선택을 가르는 결정적 요인이 무엇인지를 데이터로 보여드립니다. 고객 상담 시 비교 질문에 먼저 답할 수 있게 됩니다.</div>
+  </div>
+  <div class="benefit-item">
+    <div class="benefit-title">가격 인텔리전스</div>
+    <div class="benefit-desc">21평 턴키 3,700만원, 34평 반셀프 6,000만원 — 소비자가 직접 공유한 평형별·공사 범위별 실제 견적 데이터를 수집합니다. 소비자가 '적정하다'고 수용한 가격과 '바가지'라고 저항한 가격의 경계선을 파악하면 견적 전략이 달라집니다.</div>
+  </div>
+  <div class="benefit-item">
+    <div class="benefit-title">소비자 불만 · 시장 리스크 시그널</div>
+    <div class="benefit-desc">댓글 100개 이상 달린 분쟁 게시글에는 반드시 이유가 있습니다. 입주청소 불량, 턴키 업체 소통 문제, 누수 수리비 분쟁 — 높은 관심도를 기록한 불만 사례에서 리스크를 추출하고, 업체가 같은 실수를 피할 수 있도록 예방법을 제안합니다. 중동 전쟁발 자재 수급 위기 같은 시장 레벨 시그널도 놓치지 않습니다.</div>
+  </div>
+  <div class="benefit-item">
+    <div class="benefit-title">오늘의 액션 한 줄</div>
+    <div class="benefit-desc">리포트를 다 읽을 시간이 없어도 괜찮습니다. 오늘 데이터를 종합해서 '딱 하나만 한다면 이것'을 뽑아드립니다. 왜 오늘 해야 하는지, 어떻게 실행하는지까지 3단계로 정리합니다. 바쁜 대표님도 30초면 오늘의 액션을 파악할 수 있습니다.</div>
+  </div>
+  <div class="benefit-item">
+    <div class="benefit-title">유튜브 트렌드 브리핑</div>
+    <div class="benefit-desc">26개 인테리어 전문 유튜브 채널의 최신 영상을 자막 기반으로 요약합니다. 10분짜리 영상을 2~3줄로 읽고, 영상에서 언급된 구체적 제품명·시공법·가격 정보를 키워드로 뽑아드립니다. 영상 볼 시간 없이도 업계 전문가들이 오늘 무슨 이야기를 하는지 파악할 수 있습니다.</div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing container fade-in" id="pricing">
+  <p class="section-overline">Membership</p>
+  <h2 class="section-title">하루 263.3원으로<br>시장을 읽으십시오</h2>
+  <div class="price-card">
+    <div class="price-label">Launch Special</div>
+    <p style="font-size:13px;color:#8B3A3A;font-weight:600;margin:0 0 8px;text-align:center;">런칭 기념 특별가 — 지금이 가장 저렴합니다</p>
+    <div class="price-amount" style="position:relative;">
+      <span style="font-size:18px;color:var(--border);text-decoration:line-through;font-weight:400;display:block;margin-bottom:4px;">&#8361;9,000/월</span>
+      &#8361;7,900<small>/월</small>
+    </div>
+    <p style="font-size:16px;color:var(--olive);font-weight:700;margin:16px 0 0;text-align:center;">= 단 돈 263.3원 / 일</p>
+    <p style="font-size:12px;color:var(--text-sub);margin:6px 0 24px;text-align:center;">사탕 하나 값으로 매일 받는 비즈니스 인텔리전스</p>
+    <ul class="price-features">
+      <li>매일 아침 7시 이메일 리포트 발송</li>
+      <li>카페 700건 이상 게시글·댓글 AI 분석</li>
+      <li>26개 유튜브 전문 채널 자막 분석</li>
+      <li>제품 시그널, 가격 인텔리전스, 리스크 분석</li>
+      <li>즉시 활용 가능한 비즈니스 액션</li>
+      <li>언제든 해지 가능, 위약금 없음</li>
+    </ul>
+    <button class="cta-price" onclick="openModal()">단 돈 263.3원으로 시작하기</button>
+    <p style="font-size:11px;color:#8B3A3A;text-align:center;margin-top:10px;">&#9200; 런칭 특별가는 조기 종료될 수 있습니다</p>
+  </div>
+</section>
+
+<!-- 추천사 -->
+<section class="testimonials container fade-in">
+  <p class="section-overline">Testimonials</p>
+  <h2 class="section-title">구독자의 이야기</h2>
+  <div class="testimonial-item">
+    <p class="testimonial-quote">"아침에 커피 마시면서 5분이면 오늘 시장 상황이 파악됩니다. 상담 때 고객보다 먼저 트렌드를 언급하니까 신뢰도가 확실히 올라갔어요."</p>
+    <p class="testimonial-author">— 김OO, 인테리어 디자이너 7년차</p>
+  </div>
+  <div class="testimonial-item">
+    <p class="testimonial-quote">"견적 상담할 때 '요즘 필름시공 후 도배 접착 문제가 많다'고 먼저 말했더니 고객이 '역시 전문가'라며 바로 계약했습니다."</p>
+    <p class="testimonial-author">— 박OO, OO인테리어 대표</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq container fade-in">
+  <p class="section-overline">FAQ</p>
+  <h2 class="section-title">자주 묻는 질문</h2>
+  <div class="faq-item" onclick="this.classList.toggle('open')">
+    <div class="faq-q">어떤 데이터를 분석하나요?</div>
+    <div class="faq-a">네이버 최대 인테리어 커뮤니티의 게시글·본문·댓글 700건 이상과, 26개 인테리어 전문 유튜브 채널의 최신 영상 자막을 매일 수집하여 AI로 분석합니다. 소비자의 목소리와 업계 전문가의 관점을 동시에 파악할 수 있습니다.</div>
+  </div>
+  <div class="faq-item" onclick="this.classList.toggle('open')">
+    <div class="faq-q">리포트는 어떻게 받나요?</div>
+    <div class="faq-a">매일 아침 7시에 등록하신 이메일로 발송됩니다. 별도 앱 설치 없이 이메일만 확인하시면 됩니다.</div>
+  </div>
+  <div class="faq-item" onclick="this.classList.toggle('open')">
+    <div class="faq-q">해지는 어떻게 하나요?</div>
+    <div class="faq-a">언제든 이메일 한 통으로 즉시 해지 가능합니다. 위약금이나 별도 절차 없습니다. 해지 후에도 결제 기간까지는 리포트를 받아보실 수 있습니다.</div>
+  </div>
+  <div class="faq-item" onclick="this.classList.toggle('open')">
+    <div class="faq-q">중도 해지하면 어떻게 되나요?</div>
+    <div class="faq-a">월 단위 결제이기 때문에, 해지하셔도 이미 결제된 기간이 끝날 때까지는 리포트를 정상적으로 받아보실 수 있습니다. 예를 들어 4월 10일에 해지하셔도 다음 결제일인 5월 9일까지는 매일 리포트가 발송됩니다. 남은 기간에 대한 불이익은 전혀 없습니다.</div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="final-cta container fade-in">
+  <h2>내일 아침부터<br>시장을 읽으십시오</h2>
+  <p>단 돈 263.3원. 사탕 하나 값으로<br>경쟁 업체보다 한 발 앞서십시오.</p>
+  <a href="#pricing" class="cta-hero" style="display:inline-block;background:var(--olive);color:var(--white);font-size:14px;font-weight:600;padding:16px 48px;text-decoration:none;letter-spacing:1px;">단 돈 263.3원으로 시작하기</a>
+  <div style="margin-top:16px;">
+    <span style="display:inline-block;background-color:#8B3A3A;color:#fff;font-size:11px;padding:5px 16px;border-radius:20px;font-weight:600;letter-spacing:0.5px;">런칭 특별가</span>
+  </div>
+  <p style="margin-top:8px;font-size:12px;color:#7A7A72;">지금이 가장 저렴합니다 &middot; 조기 종료될 수 있습니다</p>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>
+      Interior Insight Daily<br>
+      문의: iiiaha@naver.com<br>
+      &copy; 2026 Interior Insight. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<!-- 구독 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h3>구독 시작하기</h3>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="홍길동">
+    </div>
+    <div class="form-group">
+      <label>Email *</label>
+      <input type="email" id="email" placeholder="example@email.com">
+    </div>
+    <div class="form-group">
+      <label>Company</label>
+      <input type="text" id="company" placeholder="OO인테리어 (선택)">
+    </div>
+    <button class="btn-submit" id="subscribeBtn" onclick="handleSubscribe()">단 돈 263.3원으로 시작하기</button>
+    <p class="note">구독 신청 후 결제 페이지로 이동합니다.<br>언제든 해지 가능합니다.</p>
+    <div class="result-message" id="resultMsg"></div>
+  </div>
+</div>
+
+<script>
+// 스크롤 페이드인
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// 모달
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// 구독 처리
+const SUPABASE_URL = 'https://laqcyjujsbfuqcmiylav.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcWN5anVqc2JmdXFjbWl5bGF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMDM3MjEsImV4cCI6MjA5MDY3OTcyMX0.JpHBbudNjK_jytTc8zr0UJATohSWViXkiILahpKLK54';
+
+async function handleSubscribe() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const company = document.getElementById('company').value.trim();
+  const btn = document.getElementById('subscribeBtn');
+  const msg = document.getElementById('resultMsg');
+
+  if (!email) {
+    msg.className = 'result-message error';
+    msg.textContent = '이메일을 입력해주세요.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({
+        email, name: name || null, company: company || null,
+        plan: 'basic', is_active: false,
+      }),
+    });
+
+    if (res.ok) {
+      msg.className = 'result-message success';
+      msg.textContent = '신청 완료! 결제 페이지로 이동합니다.';
+      // TODO: 토스페이먼츠 결제 URL로 리다이렉트
+      setTimeout(() => {
+        msg.textContent = '결제 시스템 준비 중입니다. 곧 안내드리겠습니다.';
+      }, 2000);
+    } else if (res.status === 409) {
+      msg.className = 'result-message error';
+      msg.textContent = '이미 등록된 이메일입니다.';
+    } else {
+      throw new Error();
+    }
+  } catch (e) {
+    msg.className = 'result-message error';
+    msg.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '단 돈 263.3원으로 시작하기';
+}
+</script>
+
+</body>
+</html>
