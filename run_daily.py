@@ -438,7 +438,12 @@ def get_subscribers():
         return emails
     except Exception as e:
         logger.error(f"구독자 조회 실패: {e}")
-        return []
+        # 폴백: TEST_EMAIL로 발송
+        test = os.getenv("TEST_EMAIL", "")
+        fallback = [e.strip() for e in test.split(",") if e.strip()]
+        if fallback:
+            logger.info(f"TEST_EMAIL 폴백: {fallback}")
+        return fallback
 
 
 def send_emails(html, to_emails):
