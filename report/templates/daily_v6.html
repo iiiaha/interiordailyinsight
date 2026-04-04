@@ -101,41 +101,7 @@
   {% endfor %}
   {% endif %}
 
-  <!-- ═══ Section 3: Price Intel (조건부) ═══ -->
-  {% set s3 = analysis.section3_price_intel %}
-  {% if s3.price_data %}
-  <tr>
-    <td style="padding:44px 36px 22px;">
-      <p style="margin:0 0 10px;font-size:11px;letter-spacing:3px;color:#3D4A3C;font-weight:600;">PRICE INTELLIGENCE</p>
-      <h2 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#2C2C2C;font-weight:600;">{{ s3.title }}</h2>
-    </td>
-  </tr>
 
-  {% for pd in s3.price_data %}
-  <tr>
-    <td style="padding:0 36px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="padding:16px 0;border-bottom:1px solid #F0EDE7;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="vertical-align:top;">
-                  <span style="font-size:16px;font-weight:700;color:#2C2C2C;">{{ pd.scope }}</span>
-                </td>
-                <td style="text-align:right;vertical-align:top;white-space:nowrap;">
-                  <span style="font-family:Georgia,serif;font-size:18px;font-weight:600;color:#3D4A3C;">{{ pd.price }}</span>
-                </td>
-              </tr>
-            </table>
-            <p style="margin:5px 0 0;font-size:12px;color:#9A9590;">{{ pd.includes }}</p>
-            <p style="margin:8px 0 0;font-size:14px;color:#3D4A3C;line-height:1.8;">&#8594; {{ pd.action }}</p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  {% endfor %}
-  {% endif %}
 
   <!-- ═══ Section 4: Risk Signals (조건부) ═══ -->
   {% set s4 = analysis.section4_consumer_pain %}
