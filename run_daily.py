@@ -186,7 +186,17 @@ def collect_content(page, articles):
     for i, article in enumerate(articles):
         try:
             page.goto(article["url"], wait_until="domcontentloaded", timeout=15000)
-            time.sleep(random.uniform(1.5, 2.5))
+            time.sleep(random.uniform(2.0, 3.0))
+
+            # 댓글 로딩을 위해 페이지 하단으로 스크롤
+            try:
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                time.sleep(1.5)
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                time.sleep(1.5)
+            except:
+                pass
+
             targets = [page] + [f for f in page.frames if f != page.main_frame]
 
             content = ""
@@ -206,6 +216,13 @@ def collect_content(page, articles):
 
             comments = []
             for target in targets:
+                # 댓글 영역 스크롤 + 대기
+                try:
+                    target.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                except:
+                    pass
+                time.sleep(0.5)
+
                 try:
                     items = target.query_selector_all(
                         ".comment_text_box, .u_cbox_text_wrap, "
@@ -533,7 +550,17 @@ def main():
         f.write(html)
     logger.info(f"리포트 저장: {report_file}")
 
-    # 6. 이메일 발송
+    # 6. 이메일 발송 — KST 07:00까지 대기 후 발송
+    import pytz
+    kst = pytz.timezone("Asia/Seoul")
+    now_kst = datetime.now(pytz.utc).astimezone(kst)
+    target_hour = 7
+    if now_kst.hour < target_hour:
+        wait_until = now_kst.replace(hour=target_hour, minute=0, second=0, microsecond=0)
+        wait_seconds = (wait_until - now_kst).total_seconds()
+        logger.info(f"KST {target_hour}시까지 {wait_seconds/60:.0f}분 대기...")
+        time.sleep(wait_seconds)
+
     logger.info("[7/7] 이메일 발송")
     subscribers = get_subscribers()
     if subscribers:
