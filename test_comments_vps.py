@@ -3,17 +3,14 @@ sys.path.insert(0,'/opt/idi')
 from playwright.sync_api import sync_playwright
 
 COOKIE_FILE='/opt/idi/data/naver_cookies.json'
-CONTENT_SELECTORS = [
-    ".se-main-container", ".ContentRenderer", "#postContent",
-    ".article_viewer", "#tbody", ".NHN_Writeform_Main",
-    "article", "[class*='ArticleContentBox']",
-]
 
-# 오늘 수집된 데이터에서 댓글 많을 것 같은 글 3개 가져오기
+# 댓글 수집됐던 글 중 가장 많은 것 3개
 data=json.load(open('/opt/idi/data/crawl_2026-04-04.json'))
-# 본문 있는 글 중 앞에서 3개
-targets=[d for d in data if d.get('content')][:3]
-print(f"Testing {len(targets)} posts")
+with_comments=sorted([d for d in data if len(d.get('comments',[]))>0], key=lambda x:-len(x['comments']))
+targets=with_comments[:3]
+print(f"Testing {len(targets)} posts (with most comments)")
+for t in targets:
+    print(f"  {len(t['comments'])} comments: {t['title'][:40]}")
 
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
@@ -26,28 +23,28 @@ with sync_playwright() as p:
     context.add_cookies(cookies)
     page=context.new_page()
 
+    # 댓글 0개였던 글도 1개 테스트
+    no_comments=[d for d in data if len(d.get('comments',[]))==0 and d.get('content')]
+    targets.append(no_comments[0])
+    print(f"\n+ 1 post with 0 comments: {no_comments[0]['title'][:40]}")
+
     for t in targets:
         url=t['url']
         title=t['title'][:30]
-        print(f"\n--- {title} ---")
+        prev_comments=len(t.get('comments',[]))
+        print(f"\n{'='*50}")
+        print(f"{title} (prev: {prev_comments} comments)")
         print(f"URL: {url}")
 
         page.goto(url, wait_until="domcontentloaded", timeout=15000)
         time.sleep(2)
-
-        # 스크롤 테스트
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         time.sleep(1.5)
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         time.sleep(1.5)
 
-        # 모든 frame 정보
         print(f"Frames: {len(page.frames)}")
-        for i,frame in enumerate(page.frames):
-            furl=frame.url[:80]
-            print(f"  Frame {i}: {furl}")
 
-        # 댓글 selector 테스트 - 모든 frame에서
         all_selectors = [
             ".comment_text_box",
             ".u_cbox_text_wrap",
@@ -59,21 +56,26 @@ with sync_playwright() as p:
             ".u_cbox_comment_box",
             "[class*='comment']",
             "[class*='Comment']",
-            "[class*='reply']",
         ]
 
+        found=False
         for i,frame in enumerate(page.frames):
             for sel in all_selectors:
                 try:
                     items=frame.query_selector_all(sel)
-                    if items:
-                        texts=[item.inner_text()[:50] for item in items[:3]]
-                        print(f"  FOUND Frame{i} '{sel}': {len(items)} items")
+                    if items and len(items)>0:
+                        texts=[item.inner_text()[:50] for item in items[:2]]
+                        print(f"  HIT Frame{i} '{sel}': {len(items)} items")
                         for tx in texts:
                             print(f"    > {tx}")
-                        break
+                        found=True
                 except:
                     continue
+            if found:
+                break
+
+        if not found:
+            print("  NO COMMENTS FOUND with any selector")
 
     browser.close()
 print("\nDone")
