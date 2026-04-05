@@ -89,14 +89,22 @@ def build_analysis_text(posts: list[dict], high_engagement: list[dict], max_char
         lines.append(entry)
         char_count += len(entry)
 
-    # 나머지 게시글은 제목만 (트렌드 파악용)
+    # 나머지 게시글 — 본문 포함 (200자 제한)
     remaining = [p for p in posts if p not in high_engagement]
     lines.append(f"\n{'='*60}")
-    lines.append(f"[일반 게시글 제목 — {len(remaining)}건]")
+    lines.append(f"[일반 게시글 — {len(remaining)}건 (본문 포함)]")
     lines.append(f"{'='*60}")
 
     for p in remaining:
-        entry = f"[{p.get('board', '')}] {p['title']}"
+        entry = f"\n[{p.get('board', '')}] {p['title']}"
+        content = p.get("content", "")
+        if content:
+            if len(content) > 200:
+                content = content[:200] + "..."
+            entry += f"\n{content}"
+        comments = p.get("comments", [])
+        if comments:
+            entry += f"\n댓글: {' | '.join(c[:80] for c in comments[:3])}"
         if char_count + len(entry) > max_chars:
             lines.append(f"... (이하 생략)")
             break
