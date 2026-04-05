@@ -188,17 +188,23 @@ def collect_content(page, articles):
             page.goto(article["url"], wait_until="domcontentloaded", timeout=15000)
             time.sleep(random.uniform(2.0, 3.0))
 
-            # 댓글 로딩을 위해 페이지 하단으로 스크롤
-            try:
-                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                time.sleep(1.5)
-                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                time.sleep(1.5)
-            except:
-                pass
-
             targets = [page] + [f for f in page.frames if f != page.main_frame]
 
+            # 메인 페이지 + 모든 iframe 스크롤 (댓글 로딩)
+            for target in targets:
+                try:
+                    target.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                except:
+                    pass
+            time.sleep(2)
+            for target in targets:
+                try:
+                    target.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                except:
+                    pass
+            time.sleep(2)
+
+            # 본문 수집
             content = ""
             for target in targets:
                 if content:
@@ -214,15 +220,9 @@ def collect_content(page, articles):
                     except:
                         continue
 
+            # 댓글 수집 — Frame1(iframe)에서 주로 발견됨
             comments = []
             for target in targets:
-                # 댓글 영역 스크롤 + 대기
-                try:
-                    target.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                except:
-                    pass
-                time.sleep(0.5)
-
                 try:
                     items = target.query_selector_all(
                         ".comment_text_box, .u_cbox_text_wrap, "
