@@ -1,11 +1,20 @@
-import json
-data=json.load(open('/opt/idi/data/crawl_2026-04-04.json'))
-comments=[len(d.get('comments',[])) for d in data]
-print('total posts:', len(data))
-print('with comments:', sum(1 for c in comments if c>0))
-print('avg comments:', round(sum(comments)/len(comments),1) if comments else 0)
-print('max comments:', max(comments))
-print('top 10:', sorted(comments, reverse=True)[:10])
-print('5+ comments:', sum(1 for c in comments if c>=5))
-print('3+ comments:', sum(1 for c in comments if c>=3))
-print('1+ comments:', sum(1 for c in comments if c>=1))
+import sys,json
+sys.path.insert(0,'/opt/idi')
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.proxies import WebshareProxyConfig
+data=json.load(open('/opt/idi/data/youtube_2026-04-04.json'))
+print(len(data),'videos')
+ytt=YouTubeTranscriptApi(
+    proxy_config=WebshareProxyConfig(
+        proxy_username="sbodetrh",
+        proxy_password="s0lwegl673gr",
+    )
+)
+for v in data[:5]:
+    vid=v['video_id']
+    try:
+        r=ytt.fetch(vid,languages=['ko'])
+        text=' '.join(e.text for e in r)
+        print(f"OK {vid}: {len(text)} chars")
+    except Exception as e:
+        print(f"FAIL {vid}: {type(e).__name__}")
