@@ -99,8 +99,6 @@ def build_analysis_text(posts: list[dict], high_engagement: list[dict], max_char
         entry = f"\n[{p.get('board', '')}] {p['title']}"
         content = p.get("content", "")
         if content:
-            if len(content) > 200:
-                content = content[:200] + "..."
             entry += f"\n{content}"
         comments = p.get("comments", [])
         if comments:
