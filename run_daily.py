@@ -323,21 +323,21 @@ def analyze_cafe(posts):
 {{
   "meta": {{"date": "{TODAY}", "total_posts": {len(posts)}, "high_engagement_posts": {len(high)}, "generated_at": "{datetime.now().strftime('%Y-%m-%d %H:%M')}"}},
   "section1_hot_products": {{
-    "title": "오늘의 제품/자재 시그널 TOP 10",
+    "title": "오늘의 소비자 시그널 TOP 10",
     "products": [
       {{"rank": 1, "product": "브랜드 제품명", "category": "카테고리", "signal_tag": "강추|불만|수급이슈|비교중|신제품", "one_line": "핵심 시그널 한 줄", "action": "업체 대응 인사이트 2~3문장. 존댓말."}}
     ]
   }},
   "section2_product_battles": {{
-    "title": "소비자가 지금 비교하고 있는 것",
+    "title": "소비자가 비교하고 있는 것",
     "battles": [{{"product_a": "A", "product_b": "B", "category": "카테고리", "context": "비교 배경 1줄", "action": "업체 대응 2~3문장."}}]
   }},
   "section4_consumer_pain": {{
-    "title": "오늘의 소비자 불만 시그널",
+    "title": "소비자 불만 시그널",
     "pains": [{{"headline": "문제 핵심", "severity": "심각|주의|참고", "detail": "상황 1~2문장(재구성)", "action": "예방법 2~3문장."}}]
   }},
   "section5_market_signal": {{
-    "title": "시장 레벨 시그널",
+    "title": "마켓 시그널",
     "signals": [{{"headline": "시그널 핵심", "detail": "상황 1~2문장(재구성)", "impact": "업체 영향 1줄", "action": "대응 2~3문장."}}]
   }},
   "section6_one_action": {{
