@@ -42,7 +42,6 @@ CHANNEL_URLS = [
     "https://www.youtube.com/@intelliunnie",
     "https://www.youtube.com/@golma_interior",
     "https://www.youtube.com/@lilsquare_official",
-    "https://www.youtube.com/@%EC%95%88%EB%8F%84%ED%95%98%EB%8B%A4",
     "https://www.youtube.com/@%EB%8B%A4%EC%A0%95%ED%95%9C%EC%9E%84%EC%86%8C%EC%9E%A5",
     "https://www.youtube.com/@softcondesign",
     "https://www.youtube.com/@homeludens_interior",
