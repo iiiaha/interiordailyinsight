@@ -108,13 +108,19 @@ def _get_recent_videos(youtube, channel_id: str, days_back: int = 1) -> list[dic
 def _get_transcript(video_id: str) -> str | None:
     """영상의 한국어 자막을 가져온다. Webshare 프록시 사용."""
     try:
+        import os
         from youtube_transcript_api.proxies import WebshareProxyConfig
-        ytt_api = YouTubeTranscriptApi(
-            proxy_config=WebshareProxyConfig(
-                proxy_username="sbodetrh",
-                proxy_password="s0lwegl673gr",
+        ws_user = os.getenv("WEBSHARE_USER", "")
+        ws_pass = os.getenv("WEBSHARE_PASS", "")
+        if ws_user and ws_pass:
+            ytt_api = YouTubeTranscriptApi(
+                proxy_config=WebshareProxyConfig(
+                    proxy_username=ws_user,
+                    proxy_password=ws_pass,
+                )
             )
-        )
+        else:
+            ytt_api = YouTubeTranscriptApi()
         entries = ytt_api.fetch(video_id, languages=["ko"])
         text = " ".join(entry.text for entry in entries)
         return text if text.strip() else None
