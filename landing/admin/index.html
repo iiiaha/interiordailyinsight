@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Interior Daily Insight</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+:root {
+  --bg: #F5F3EF;
+  --surface: #FFFFFF;
+  --surface-2: #EDEAE4;
+  --ink: #1B1B1A;
+  --ink-2: #4A4A48;
+  --ink-3: #7A7A72;
+  --ink-4: #B4AFA5;
+  --line: #DCD6C9;
+  --line-soft: #E8E3D6;
+  --olive: #3D4A3C;
+  --olive-soft: #EBEEE9;
+  --danger: #8B3A3A;
+  --success: #2B5A37;
+  --font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --mono: 'SF Mono', Menlo, Consolas, monospace;
+  --shadow-sm: 0 1px 2px rgba(27,27,26,0.04);
+  --shadow-md: 0 4px 16px rgba(27,27,26,0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: var(--font); color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body { min-height: 100vh; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+input, select { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--olive); color: #fff; }
+:focus-visible { outline: 2px solid var(--olive); outline-offset: 2px; }
+
+/* ═══ LAYOUT ═══ */
+.app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+/* ─ SIDEBAR ─ */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: 28px 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.brand {
+  padding: 4px 8px 24px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.brand .name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+.brand .sub {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-item .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.nav-item:hover { background: var(--surface-2); color: var(--ink); }
+.nav-item:hover .dot { background: var(--ink-3); }
+.nav-item.active { background: var(--olive-soft); color: var(--olive); font-weight: 600; }
+.nav-item.active .dot { background: var(--olive); transform: scale(1.4); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 12px 4px;
+  border-top: 1px solid var(--line);
+}
+.sidebar-footer .meta {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.sidebar-footer .meta.small { font-size: 10px; color: var(--ink-4); }
+
+/* ─ MAIN ─ */
+.main {
+  padding: 32px 40px 80px;
+  max-width: 1400px;
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fade 0.25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─ PAGE HEADER ─ */
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.page-head h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+.page-head .desc {
+  font-size: 13px;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.page-head .right {
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: right;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.7;
+}
+.page-head .right .v { color: var(--ink); font-weight: 600; }
+
+/* ─ KPI ─ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px 22px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.kpi:hover { box-shadow: var(--shadow-md); border-color: var(--ink-4); }
+.kpi .label {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 0.2px;
+}
+.kpi .value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.kpi .value small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+.kpi .sub {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.kpi .sub.pos { color: var(--success); }
+.kpi .sub.neg { color: var(--danger); }
+
+/* ─ SECTION ─ */
+.section { margin-bottom: 40px; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.section-head h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+}
+.section-head .rubric {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─ TOOLBAR ─ */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.search {
+  flex: 1;
+  position: relative;
+  max-width: 480px;
+}
+.search input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px 10px 36px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.search input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px var(--olive-soft); }
+.search input::placeholder { color: var(--ink-4); }
+.search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-4);
+}
+
+/* ─ BUTTONS ─ */
+.btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 14px;
+  background: var(--surface);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  letter-spacing: -0.1px;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--ink-4); color: var(--ink); }
+.btn.primary { background: var(--olive); color: #fff; border-color: var(--olive); }
+.btn.primary:hover { background: #2d3a2c; border-color: #2d3a2c; }
+.btn.danger { color: var(--danger); border-color: transparent; background: transparent; padding: 6px 10px; font-size: 11px; }
+.btn.danger:hover { background: #FDEAEA; border-color: #F3D5D2; color: var(--danger); }
+
+/* ─ TABLE ─ */
+.tbl-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl thead th {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 600;
+  text-align: left;
+  padding: 11px 14px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.tbl tbody tr {
+  border-bottom: 1px solid var(--line-soft);
+  transition: background 0.12s ease;
+}
+.tbl tbody tr:last-child { border-bottom: none; }
+.tbl tbody tr:hover { background: var(--surface-2); }
+.tbl tbody td {
+  padding: 13px 14px;
+  vertical-align: middle;
+  color: var(--ink-2);
+}
+.tbl td.email { color: var(--ink); font-weight: 500; font-feature-settings: "tnum"; }
+.tbl td.name { color: var(--ink); font-weight: 500; }
+.tbl td.name.empty, .tbl td.company.empty { color: var(--ink-4); font-weight: 400; }
+.tbl td.company.empty::before { content: "—"; }
+.tbl td.date { color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl td.plan {
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.tbl td.actions { text-align: right; white-space: nowrap; }
+
+/* status badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+}
+.badge::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+.badge.active { background: var(--olive-soft); color: var(--olive); }
+.badge.active::before { background: var(--olive); }
+.badge.ok { background: #E6F2E8; color: var(--success); }
+.badge.ok::before { background: var(--success); }
+.badge.err { background: #FDEAEA; color: var(--danger); }
+.badge.err::before { background: var(--danger); }
+
+/* empty / loading */
+.empty, .loading {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.empty .mark { font-size: 24px; color: var(--ink-4); margin-bottom: 8px; font-weight: 300; }
+
+/* ─ MODAL ─ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(27,27,26,0.4);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  animation: fade 0.15s ease;
+}
+.overlay.on { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 28px;
+  width: 420px;
+  max-width: 92vw;
+  box-shadow: 0 24px 60px rgba(27,27,26,0.2);
+  animation: pop 0.2s cubic-bezier(.4,0,.2,1);
+}
+@keyframes pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+.modal .modal-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: 20px;
+}
+.modal .field { margin-bottom: 14px; }
+.modal label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+.modal input, .modal select {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 11px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.modal input:focus, .modal select:focus { border-color: var(--olive); box-shadow: 0 0 0 3px var(--olive-soft); }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 22px;
+}
+.modal .result {
+  margin-top: 12px;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  display: none;
+}
+.modal .result.show { display: block; }
+.modal .result.ok { background: #E6F2E8; color: var(--success); }
+.modal .result.err { background: #FDEAEA; color: var(--danger); }
+
+/* ─ HISTORY ─ */
+.history-list { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.history-entry {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  align-items: center;
+  gap: 20px;
+  transition: background 0.12s ease;
+}
+.history-entry:last-child { border-bottom: none; }
+.history-entry:hover { background: var(--surface-2); }
+.history-entry .when { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.history-entry .what { font-size: 13px; color: var(--ink); font-weight: 500; }
+.history-entry .what .meta { font-size: 11px; color: var(--ink-3); font-weight: 400; margin-top: 2px; }
+
+/* ─ CHART ─ */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.chart { width: 100%; height: 240px; display: block; }
+.chart .axis-label { font-size: 10px; fill: var(--ink-3); }
+.chart .grid-line { stroke: var(--line-soft); stroke-width: 1; stroke-dasharray: 2 3; }
+.chart .line { fill: none; stroke: var(--olive); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .area { fill: var(--olive); opacity: 0.08; }
+.chart .dot { fill: var(--surface); stroke: var(--olive); stroke-width: 2; }
+.chart .callout { font-size: 11px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ─ BREAKDOWN ─ */
+.breakdown-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 18px;
+}
+.breakdown .row {
+  display: grid;
+  grid-template-columns: 200px 1fr 50px;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.breakdown .row:last-child { border-bottom: none; }
+.breakdown .co { font-size: 13px; color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.breakdown .bar-wrap { height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.breakdown .bar { height: 100%; background: var(--olive); border-radius: 999px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+.breakdown .n { font-size: 12px; color: var(--ink-3); text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* ─ NOTE ─ */
+.note {
+  padding: 14px 18px;
+  background: var(--olive-soft);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.note .nt-label { font-size: 11px; font-weight: 700; color: var(--olive); margin-bottom: 4px; letter-spacing: 0.1px; }
+.note .nt-body { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+.note code { font-family: var(--mono); font-size: 12px; background: rgba(61,74,60,0.1); padding: 1px 5px; border-radius: 3px; }
+
+/* responsive */
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+  .main { padding: 24px 16px 60px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-head .right { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="name">Interior Daily Insight</div>
+    <div class="sub">Admin</div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <button class="nav-item active" data-page="dashboard"><span class="dot"></span>대시보드</button>
+    <button class="nav-item" data-page="subscribers"><span class="dot"></span>구독자</button>
+    <button class="nav-item" data-page="history"><span class="dot"></span>발송 이력</button>
+    <button class="nav-item" data-page="content"><span class="dot"></span>콘텐츠</button>
+    <button class="nav-item" data-page="stats"><span class="dot"></span>통계</button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="meta" id="side-date">—</div>
+    <div class="meta small" id="side-circ">—</div>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- Dashboard -->
+<section class="page active" id="page-dashboard">
+  <div class="page-head">
+    <div>
+      <h1>대시보드</h1>
+      <div class="desc">오늘의 구독자·발송 현황 요약</div>
+    </div>
+    <div class="right">
+      <div id="hero-date">—</div>
+      <div>KST <span class="v" id="hero-time">—</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="label">활성 구독자</div>
+      <div class="value" id="kpi-active">—</div>
+      <div class="sub" id="kpi-active-sub">전체 —명</div>
+    </div>
+    <div class="kpi">
+      <div class="label">오늘 가입</div>
+      <div class="value" id="kpi-today">—</div>
+      <div class="sub" id="kpi-today-sub">최근 7일 +—</div>
+    </div>
+    <div class="kpi">
+      <div class="label">오늘 발송 성공</div>
+      <div class="value" id="kpi-ok">—</div>
+      <div class="sub" id="kpi-ok-sub">오늘</div>
+    </div>
+    <div class="kpi">
+      <div class="label">오늘 발송 실패</div>
+      <div class="value" id="kpi-fail">—</div>
+      <div class="sub" id="kpi-fail-sub">오늘</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>최근 가입자</h2>
+      <span class="rubric" id="arrivals-count">—</span>
+    </div>
+    <div class="tbl-card">
+      <table class="tbl">
+        <thead><tr>
+          <th>이메일</th><th>이름</th><th>회사</th><th>플랜</th><th>가입 시각</th><th>상태</th>
+        </tr></thead>
+        <tbody id="arrivals-body"><tr><td colspan="6" class="loading">불러오는 중…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Subscribers -->
+<section class="page" id="page-subscribers">
+  <div class="page-head">
+    <div>
+      <h1>구독자</h1>
+      <div class="desc">전체 구독자 목록 · 검색 · 추가 · 해지</div>
+    </div>
+    <div class="right">
+      <div>전체 <span class="v" id="sub-total">—</span> · 활성 <span class="v" id="sub-active">—</span></div>
+      <div>오늘 +<span class="v" id="sub-new">—</span></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="sub-search" placeholder="이메일·이름·회사로 검색">
+    </div>
+    <button class="btn primary" onclick="openAddModal()">구독자 추가</button>
+  </div>
+
+  <div class="tbl-card">
+    <table class="tbl">
+      <thead><tr>
+        <th>상태</th><th>이메일</th><th>이름</th><th>회사</th><th>플랜</th><th>가입일</th><th></th>
+      </tr></thead>
+      <tbody id="subs-body"><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- History -->
+<section class="page" id="page-history">
+  <div class="page-head">
+    <div>
+      <h1>발송 이력</h1>
+      <div class="desc">매일 아침 7시 발송된 리포트 기록 (Supabase <code style="font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:3px;">weekly_reports</code>)</div>
+    </div>
+    <div class="right">
+      <div>전체 <span class="v" id="hist-count">—</span></div>
+    </div>
+  </div>
+  <div id="history-list"><div class="loading">불러오는 중…</div></div>
+</section>
+
+<!-- Content -->
+<section class="page" id="page-content">
+  <div class="page-head">
+    <div>
+      <h1>콘텐츠</h1>
+      <div class="desc">발급된 리포트 파일 확인</div>
+    </div>
+  </div>
+  <div class="note">
+    <div class="nt-label">안내</div>
+    <div class="nt-body">웹 admin 은 로컬 디스크 파일을 직접 읽을 수 없습니다. 리포트 미리보기는 <code>data/report_YYYY-MM-DD.html</code> 을 파일 탐색기에서 더블클릭하거나, VS Code 의 Live Server 로 열어서 확인하세요. 추후 Supabase Storage 에 리포트를 업로드하면 이 섹션에서 바로 볼 수 있습니다.</div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="page" id="page-stats">
+  <div class="page-head">
+    <div>
+      <h1>통계</h1>
+      <div class="desc">구독자 증가 추이 · 해지율 · 회사 분포</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="label">전체 구독자</div>
+      <div class="value" id="st-total">—</div>
+    </div>
+    <div class="kpi">
+      <div class="label">활성</div>
+      <div class="value" id="st-active">—</div>
+    </div>
+    <div class="kpi">
+      <div class="label">이번 주 신규</div>
+      <div class="value" id="st-week">—</div>
+      <div class="sub pos" id="st-week-sub">오늘 +—</div>
+    </div>
+    <div class="kpi">
+      <div class="label">해지율</div>
+      <div class="value" id="st-churn">—<small>%</small></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>가입자 증가 추이</h2>
+      <span class="rubric">누적 구독자</span>
+    </div>
+    <div class="chart-card">
+      <svg class="chart" id="growth-chart" viewBox="0 0 800 240" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>회사별 분포</h2>
+      <span class="rubric">상위 10개</span>
+    </div>
+    <div class="breakdown-card breakdown" id="breakdown"></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- Add Modal -->
+<div class="overlay" id="add-overlay">
+  <div class="modal">
+    <h3>구독자 추가</h3>
+    <p class="modal-sub">이메일만 필수. 추가 즉시 활성 상태로 저장됩니다.</p>
+
+    <div class="field">
+      <label>이메일 *</label>
+      <input type="email" id="f-email" placeholder="example@domain.com">
+    </div>
+    <div class="field">
+      <label>이름</label>
+      <input type="text" id="f-name" placeholder="홍길동">
+    </div>
+    <div class="field">
+      <label>회사명</label>
+      <input type="text" id="f-company" placeholder="OO 인테리어">
+    </div>
+    <div class="field">
+      <label>플랜</label>
+      <select id="f-plan">
+        <option value="basic">basic</option>
+        <option value="pro">pro</option>
+      </select>
+    </div>
+
+    <div class="result" id="add-result"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">취소</button>
+      <button class="btn primary" onclick="submitAdd()">추가</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://laqcyjujsbfuqcmiylav.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcWN5anVqc2JmdXFjbWl5bGF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMDM3MjEsImV4cCI6MjA5MDY3OTcyMX0.JpHBbudNjK_jytTc8zr0UJATohSWViXkiILahpKLK54';
+
+async function sb(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: opts.prefer || 'return=representation',
+      ...(opts.headers || {}),
+    },
+    ...opts,
+  });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmtDate(d) {
+  if (!d) return '—';
+  const x = new Date(d);
+  return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())} ${pad(x.getHours())}:${pad(x.getMinutes())}`;
+}
+function fmtDateShort(d) {
+  if (!d) return '—';
+  const x = new Date(d);
+  return `${x.getFullYear()}.${pad(x.getMonth()+1)}.${pad(x.getDate())}`;
+}
+function fmtTime(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function dayStart(d) { const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateMeta(circ) {
+  const now = new Date();
+  document.getElementById('hero-date').textContent = fmtDateShort(now);
+  document.getElementById('hero-time').textContent = fmtTime(now);
+  document.getElementById('side-date').textContent = `${fmtDateShort(now)} · ${fmtTime(now)}`;
+  if (circ !== undefined) document.getElementById('side-circ').textContent = `${circ} active · ${SUBS.length} total`;
+}
+setInterval(() => updateMeta(), 30000);
+
+// Nav
+const loaded = {};
+document.getElementById('nav').addEventListener('click', e => {
+  const btn = e.target.closest('.nav-item');
+  if (!btn) return;
+  const page = btn.dataset.page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n === btn));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+  if (!loaded[page]) {
+    loaded[page] = true;
+    if (page === 'history') loadHistory();
+    if (page === 'stats') loadStats();
+  }
+});
+
+// Data
+let SUBS = [];
+
+async function loadSubscribers() {
+  try {
+    SUBS = await sb('subscribers?order=created_at.desc');
+  } catch (e) {
+    console.error(e); SUBS = [];
+  }
+  renderDashboard();
+  renderSubsTable();
+}
+
+function renderDashboard() {
+  const active = SUBS.filter(s => s.is_active);
+  const today = dayStart(new Date());
+  const todayNew = SUBS.filter(s => s.created_at && new Date(s.created_at) >= today);
+  const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekNew = SUBS.filter(s => s.created_at && new Date(s.created_at) >= weekAgo);
+
+  document.getElementById('kpi-active').innerHTML = `${active.length}<small>명</small>`;
+  document.getElementById('kpi-active-sub').textContent = `전체 ${SUBS.length}명`;
+  document.getElementById('kpi-today').innerHTML = `+${todayNew.length}<small>명</small>`;
+  document.getElementById('kpi-today-sub').textContent = `최근 7일 +${weekNew.length}명`;
+
+  sb(`send_logs?sent_at=gte.${today.toISOString()}`).then(logs => {
+    const ok = logs.filter(l => l.status === 'success').length;
+    const fail = logs.filter(l => l.status === 'failed').length;
+    document.getElementById('kpi-ok').innerHTML = `${ok}<small>건</small>`;
+    document.getElementById('kpi-fail').innerHTML = `${fail}<small>건</small>`;
+    if (fail > 0) document.getElementById('kpi-fail-sub').className = 'sub neg';
+    if (ok > 0) document.getElementById('kpi-ok-sub').className = 'sub pos';
+  }).catch(() => {
+    document.getElementById('kpi-ok').innerHTML = `0<small>건</small>`;
+    document.getElementById('kpi-fail').innerHTML = `0<small>건</small>`;
+  });
+
+  updateMeta(active.length);
+
+  const latest = SUBS.slice(0, 8);
+  document.getElementById('arrivals-count').textContent = `${latest.length} / ${SUBS.length}명 표시`;
+  const body = document.getElementById('arrivals-body');
+  if (!latest.length) {
+    body.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="mark">—</div>아직 구독자가 없습니다.</div></td></tr>';
+    return;
+  }
+  body.innerHTML = latest.map(s => `
+    <tr>
+      <td class="email">${escapeHtml(s.email)}</td>
+      <td class="name ${s.name?'':'empty'}">${escapeHtml(s.name) || '—'}</td>
+      <td class="company ${s.company?'':'empty'}">${escapeHtml(s.company) || ''}</td>
+      <td class="plan">${s.plan || 'basic'}</td>
+      <td class="date">${fmtDate(s.created_at)}</td>
+      <td><span class="badge ${s.is_active?'active':''}">${s.is_active?'active':'paused'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderSubsTable(filter = '') {
+  const total = SUBS.length;
+  const active = SUBS.filter(s => s.is_active).length;
+  const today = dayStart(new Date());
+  const newToday = SUBS.filter(s => s.created_at && new Date(s.created_at) >= today).length;
+  document.getElementById('sub-total').textContent = total;
+  document.getElementById('sub-active').textContent = active;
+  document.getElementById('sub-new').textContent = newToday;
+
+  const q = filter.trim().toLowerCase();
+  const filtered = q ? SUBS.filter(s =>
+    (s.email||'').toLowerCase().includes(q) ||
+    (s.name||'').toLowerCase().includes(q) ||
+    (s.company||'').toLowerCase().includes(q)
+  ) : SUBS;
+
+  const body = document.getElementById('subs-body');
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="mark">—</div>${q ? '조건에 맞는 구독자가 없습니다.' : '아직 구독자가 없습니다.'}</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = filtered.map(s => `
+    <tr>
+      <td><span class="badge ${s.is_active?'active':''}">${s.is_active?'active':'paused'}</span></td>
+      <td class="email">${escapeHtml(s.email)}</td>
+      <td class="name ${s.name?'':'empty'}">${escapeHtml(s.name) || '—'}</td>
+      <td class="company ${s.company?'':'empty'}">${escapeHtml(s.company) || ''}</td>
+      <td class="plan">${s.plan || 'basic'}</td>
+      <td class="date">${fmtDate(s.created_at)}</td>
+      <td class="actions">
+        ${s.is_active
+          ? `<button class="btn danger" onclick="toggleSub('${s.id}', false)">해지</button>`
+          : `<button class="btn danger" style="color:var(--success)" onclick="toggleSub('${s.id}', true)">재활성</button>`}
+      </td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('sub-search').addEventListener('input', e => renderSubsTable(e.target.value));
+
+async function toggleSub(id, activate) {
+  const verb = activate ? '재활성화' : '해지';
+  if (!confirm(`이 구독자를 ${verb}하시겠습니까?`)) return;
+  try {
+    await sb(`subscribers?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: activate }),
+    });
+    await loadSubscribers();
+  } catch (e) {
+    alert('실패: ' + e.message);
+  }
+}
+
+// Add modal
+function openAddModal() {
+  document.getElementById('add-overlay').classList.add('on');
+  setTimeout(() => document.getElementById('f-email').focus(), 50);
+}
+function closeAddModal() {
+  document.getElementById('add-overlay').classList.remove('on');
+  ['f-email','f-name','f-company'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('add-result').className = 'result';
+}
+document.getElementById('add-overlay').addEventListener('click', e => {
+  if (e.target.id === 'add-overlay') closeAddModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAddModal(); });
+
+async function submitAdd() {
+  const email = document.getElementById('f-email').value.trim();
+  const name = document.getElementById('f-name').value.trim() || null;
+  const company = document.getElementById('f-company').value.trim() || null;
+  const plan = document.getElementById('f-plan').value;
+  const result = document.getElementById('add-result');
+  if (!email) {
+    result.className = 'result show err';
+    result.textContent = '이메일은 필수입니다.';
+    return;
+  }
+  try {
+    await sb('subscribers', {
+      method: 'POST',
+      body: JSON.stringify({ email, name, company, plan, is_active: true }),
+    });
+    result.className = 'result show ok';
+    result.textContent = '추가되었습니다.';
+    await loadSubscribers();
+    setTimeout(closeAddModal, 700);
+  } catch (e) {
+    result.className = 'result show err';
+    result.textContent = e.message.includes('409') ? '이미 등록된 이메일입니다.' : '실패: ' + e.message;
+  }
+}
+
+// History
+async function loadHistory() {
+  const list = document.getElementById('history-list');
+  try {
+    const reports = await sb('weekly_reports?order=created_at.desc&limit=30');
+    document.getElementById('hist-count').textContent = `${reports.length}건`;
+    if (!reports.length) {
+      list.innerHTML = '<div class="tbl-card"><div class="empty"><div class="mark">—</div>아직 발송된 리포트가 없습니다.</div></div>';
+      return;
+    }
+    list.innerHTML = `<div class="history-list">` + reports.map(r => `
+      <div class="history-entry">
+        <div class="when">${fmtDate(r.sent_at || r.created_at)}</div>
+        <div class="what">
+          ${r.week_start || ''} ~ ${r.week_end || ''}
+          <div class="meta">수신자 ${r.recipient_count || 0}명</div>
+        </div>
+        <div><span class="badge ok">sent</span></div>
+      </div>
+    `).join('') + `</div>`;
+  } catch (e) {
+    list.innerHTML = `<div class="note"><div class="nt-label">안내</div><div class="nt-body"><code>weekly_reports</code> 테이블이 아직 없거나 접근 권한이 없습니다. 첫 발송 이후 생성됩니다.</div></div>`;
+  }
+}
+
+// Stats
+async function loadStats() {
+  const total = SUBS.length;
+  const active = SUBS.filter(s => s.is_active).length;
+  const today = dayStart(new Date());
+  const newToday = SUBS.filter(s => s.created_at && new Date(s.created_at) >= today).length;
+  const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+  const newWeek = SUBS.filter(s => s.created_at && new Date(s.created_at) >= weekAgo).length;
+  const churn = total > 0 ? (((total - active) / total) * 100).toFixed(1) : '0.0';
+
+  document.getElementById('st-total').innerHTML = `${total}<small>명</small>`;
+  document.getElementById('st-active').innerHTML = `${active}<small>명</small>`;
+  document.getElementById('st-week').innerHTML = `+${newWeek}<small>명</small>`;
+  document.getElementById('st-week-sub').textContent = `오늘 +${newToday}명`;
+  document.getElementById('st-churn').innerHTML = `${churn}<small>%</small>`;
+
+  drawGrowthChart();
+  drawBreakdown();
+}
+
+function drawGrowthChart() {
+  const svg = document.getElementById('growth-chart');
+  svg.innerHTML = '';
+  if (!SUBS.length) {
+    svg.innerHTML = '<text x="400" y="120" text-anchor="middle" class="axis-label" style="font-size:12px">데이터 없음</text>';
+    return;
+  }
+  const byDay = {};
+  SUBS.forEach(s => {
+    if (!s.created_at) return;
+    const key = new Date(s.created_at).toISOString().slice(0,10);
+    byDay[key] = (byDay[key] || 0) + 1;
+  });
+  const dates = Object.keys(byDay).sort();
+  if (!dates.length) return;
+
+  const first = new Date(dates[0]);
+  const last = new Date();
+  const points = [];
+  let cum = 0;
+  for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+    const key = d.toISOString().slice(0,10);
+    cum += byDay[key] || 0;
+    points.push({ date: new Date(d), value: cum });
+  }
+
+  const W = 800, H = 240, PAD_L = 36, PAD_R = 20, PAD_T = 20, PAD_B = 30;
+  const plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  const maxV = Math.max(...points.map(p => p.value), 5);
+  const xScale = i => PAD_L + (i / Math.max(points.length - 1, 1)) * plotW;
+  const yScale = v => PAD_T + plotH - (v / maxV) * plotH;
+
+  const ticks = 4;
+  let grid = '';
+  for (let i = 0; i <= ticks; i++) {
+    const y = PAD_T + (plotH * i / ticks);
+    const v = Math.round(maxV * (1 - i / ticks));
+    grid += `<line class="grid-line" x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}"/>`;
+    grid += `<text class="axis-label" x="${PAD_L - 8}" y="${y + 3}" text-anchor="end">${v}</text>`;
+  }
+
+  const xLabels = [0, Math.floor(points.length/2), points.length - 1].map(i => {
+    const p = points[i];
+    return `<text class="axis-label" x="${xScale(i)}" y="${H - PAD_B + 16}" text-anchor="middle">${fmtDateShort(p.date)}</text>`;
+  }).join('');
+
+  const linePath = points.map((p, i) => `${i===0?'M':'L'}${xScale(i)},${yScale(p.value)}`).join(' ');
+  const areaPath = `${linePath} L${xScale(points.length-1)},${yScale(0)} L${xScale(0)},${yScale(0)} Z`;
+  const last_ = points[points.length - 1];
+  const callout = `
+    <circle class="dot" cx="${xScale(points.length-1)}" cy="${yScale(last_.value)}" r="4"/>
+    <text class="callout" x="${xScale(points.length-1) - 8}" y="${yScale(last_.value) - 10}" text-anchor="end">${last_.value}명</text>
+  `;
+
+  svg.innerHTML = grid + `<path class="area" d="${areaPath}"/><path class="line" d="${linePath}"/>${callout}${xLabels}`;
+}
+
+function drawBreakdown() {
+  const active = SUBS.filter(s => s.is_active && s.company);
+  const counts = {};
+  active.forEach(s => counts[s.company] = (counts[s.company] || 0) + 1);
+  const rows = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const el = document.getElementById('breakdown');
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty"><div class="mark">—</div>회사 정보를 입력한 구독자가 없습니다.</div>';
+    return;
+  }
+  const max = rows[0][1];
+  el.innerHTML = rows.map(([co, n]) => `
+    <div class="row">
+      <div class="co">${escapeHtml(co)}</div>
+      <div class="bar-wrap"><div class="bar" style="width:${(n/max)*100}%"></div></div>
+      <div class="n">${n}명</div>
+    </div>
+  `).join('');
+}
+
+// Boot
+updateMeta();
+loadSubscribers();
+</script>
+</body>
+</html>
