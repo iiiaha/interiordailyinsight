@@ -441,6 +441,13 @@ def generate_report(analysis, youtube_analysis=None):
 
 def get_subscribers():
     """Supabase에서 활성 구독자 이메일 목록을 가져온다."""
+    # 테스트 모드: TEST_MODE=1 이면 구독자 조회 건너뛰고 TEST_EMAIL 로만 발송
+    if os.getenv("TEST_MODE") == "1":
+        test = os.getenv("TEST_EMAIL", "")
+        emails = [e.strip() for e in test.split(",") if e.strip()]
+        logger.info(f"TEST_MODE 활성 — 실제 구독자 건너뛰고 TEST_EMAIL 로만 발송: {emails}")
+        return emails
+
     if not SUPABASE_URL or "placeholder" in SUPABASE_URL:
         # Supabase 미설정 시 테스트 이메일
         test = os.getenv("TEST_EMAIL", "")
