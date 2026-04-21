@@ -335,6 +335,11 @@
     font-size: 11px; color: var(--text-sub); text-align: center;
     margin-top: 12px; line-height: 1.5;
   }
+  .modal .disclaimer {
+    font-size: 10px; color: var(--border); text-align: center;
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+    line-height: 1.6; font-style: italic;
+  }
   .result-message {
     padding: 12px; text-align: center; font-size: 13px;
     margin-top: 12px; display: none;
@@ -592,7 +597,8 @@
       <input type="text" id="company" placeholder="OO인테리어 (선택)">
     </div>
     <button class="btn-submit" id="subscribeBtn" onclick="handleSubscribe()">무료 구독 시작하기</button>
-    <p class="note">입력 즉시 구독이 시작됩니다.<br>내일 아침 7시부터 리포트가 발송됩니다.</p>
+    <p class="note">입력 즉시 구독이 시작됩니다. 내일 아침 7시부터 리포트가 발송됩니다.</p>
+    <p class="disclaimer">본 서비스는 개인 프로젝트로 운영되고 있으며, 사전 안내 없이 종료될 수 있습니다. 너른 양해 부탁드립니다.</p>
     <div class="result-message" id="resultMsg"></div>
   </div>
 </div>
