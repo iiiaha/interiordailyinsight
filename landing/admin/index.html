@@ -490,6 +490,67 @@ a { color: inherit; text-decoration: none; }
 .note .nt-body { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
 .note code { font-family: var(--mono); font-size: 12px; background: rgba(61,74,60,0.1); padding: 1px 5px; border-radius: 3px; }
 
+/* ─ CONTENT ─ */
+.content-split {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+  height: calc(100vh - 200px);
+  min-height: 520px;
+}
+.content-list {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-y: auto;
+  padding: 8px;
+}
+.content-list .item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border: 1px solid transparent;
+}
+.content-list .item:hover { background: var(--surface-2); }
+.content-list .item.active { background: var(--olive-soft); border-color: var(--olive); }
+.content-list .item .d { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.2px; }
+.content-list .item .s { font-size: 11px; color: var(--ink-3); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.content-list .item.active .d { color: var(--olive); }
+.content-list .item.noop { cursor: default; opacity: 0.55; }
+.content-list .item.noop:hover { background: transparent; }
+.content-list .item.noop .s { color: var(--ink-4); }
+.content-preview {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.content-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none;
+  background: #fff;
+}
+.content-preview iframe.on { display: block; }
+.content-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.content-preview iframe.on + .content-empty { display: none; }
+@media (max-width: 980px) {
+  .content-split { grid-template-columns: 1fr; height: auto; }
+  .content-list { max-height: 280px; }
+  .content-preview { min-height: 520px; }
+}
+
 /* ─ LOGIN ─ */
 .login-wrap {
   position: fixed; inset: 0;
@@ -714,12 +775,18 @@ a { color: inherit; text-decoration: none; }
   <div class="page-head">
     <div>
       <h1>콘텐츠</h1>
-      <div class="desc">발급된 리포트 파일 확인</div>
+      <div class="desc">발급된 리포트 미리보기 (<code style="font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:3px;">weekly_reports.html_content</code>)</div>
+    </div>
+    <div class="right">
+      <div>총 <span class="v" id="content-count">—</span></div>
     </div>
   </div>
-  <div class="note">
-    <div class="nt-label">안내</div>
-    <div class="nt-body">웹 admin 은 로컬 디스크 파일을 직접 읽을 수 없습니다. 리포트 미리보기는 <code>data/report_YYYY-MM-DD.html</code> 을 파일 탐색기에서 더블클릭하거나, VS Code 의 Live Server 로 열어서 확인하세요. 추후 Supabase Storage 에 리포트를 업로드하면 이 섹션에서 바로 볼 수 있습니다.</div>
+  <div class="content-split">
+    <aside class="content-list" id="content-list"><div class="loading">불러오는 중…</div></aside>
+    <div class="content-preview">
+      <iframe id="content-frame" title="리포트 미리보기"></iframe>
+      <div class="content-empty" id="content-empty">왼쪽 목록에서 날짜를 선택하세요.</div>
+    </div>
   </div>
 </section>
 
@@ -966,6 +1033,7 @@ document.getElementById('nav').addEventListener('click', e => {
   if (!loaded[page]) {
     loaded[page] = true;
     if (page === 'history') loadHistory();
+    if (page === 'content') loadContent();
     if (page === 'stats') loadStats();
   }
 });
@@ -1142,6 +1210,54 @@ async function loadHistory() {
     `).join('') + `</div>`;
   } catch (e) {
     list.innerHTML = `<div class="note"><div class="nt-label">안내</div><div class="nt-body"><code>weekly_reports</code> 테이블이 아직 없거나 접근 권한이 없습니다. 첫 발송 이후 생성됩니다.</div></div>`;
+  }
+}
+
+// Content
+async function loadContent() {
+  const listEl = document.getElementById('content-list');
+  const countEl = document.getElementById('content-count');
+  try {
+    const rows = await sb('weekly_reports?select=id,week_start,week_end,sent_at,created_at,recipient_count&order=created_at.desc&limit=60');
+    countEl.textContent = `${rows.length}건`;
+    if (!rows.length) {
+      listEl.innerHTML = '<div class="item noop"><div class="d">리포트 없음</div><div class="s">첫 발송 이후 여기에 표시됩니다.</div></div>';
+      return;
+    }
+    listEl.innerHTML = rows.map(r => `
+      <div class="item" data-id="${r.id}">
+        <div class="d">${fmtDateShort(r.sent_at || r.created_at)}</div>
+        <div class="s">수신자 ${r.recipient_count || 0}명</div>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.item[data-id]').forEach(el => {
+      el.addEventListener('click', () => selectContent(el.dataset.id, el));
+    });
+    // 최신 자동 선택
+    const first = listEl.querySelector('.item[data-id]');
+    if (first) selectContent(first.dataset.id, first);
+  } catch (e) {
+    listEl.innerHTML = `<div class="item noop"><div class="d">로딩 실패</div><div class="s">${escapeHtml(e.message)}</div></div>`;
+  }
+}
+
+async function selectContent(id, el) {
+  document.querySelectorAll('.content-list .item').forEach(x => x.classList.toggle('active', x === el));
+  const frame = document.getElementById('content-frame');
+  const empty = document.getElementById('content-empty');
+  empty.textContent = '불러오는 중…';
+  frame.classList.remove('on');
+  try {
+    const rows = await sb(`weekly_reports?select=html_content&id=eq.${id}`);
+    const html = rows[0]?.html_content;
+    if (!html) {
+      empty.textContent = '이 리포트에 저장된 HTML 이 없습니다.';
+      return;
+    }
+    frame.srcdoc = html;
+    frame.classList.add('on');
+  } catch (e) {
+    empty.textContent = '불러오기 실패: ' + e.message;
   }
 }
 
