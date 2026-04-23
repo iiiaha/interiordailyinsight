@@ -440,47 +440,105 @@ def generate_report(analysis, youtube_analysis=None):
 # ══════════════════════════════════════════════════════
 
 def get_subscribers():
-    """Supabase에서 활성 구독자 이메일 목록을 가져온다."""
-    # 테스트 모드: TEST_MODE=1 이면 구독자 조회 건너뛰고 TEST_EMAIL 로만 발송
-    if os.getenv("TEST_MODE") == "1":
+    """활성 구독자 정보(id, email) 리스트를 반환한다.
+
+    TEST_MODE 또는 Supabase 미설정 시 TEST_EMAIL 폴백. 폴백 항목의 id 는 None.
+    """
+    def _fallback():
         test = os.getenv("TEST_EMAIL", "")
-        emails = [e.strip() for e in test.split(",") if e.strip()]
-        logger.info(f"TEST_MODE 활성 — 실제 구독자 건너뛰고 TEST_EMAIL 로만 발송: {emails}")
-        return emails
+        return [{"id": None, "email": e.strip()} for e in test.split(",") if e.strip()]
+
+    if os.getenv("TEST_MODE") == "1":
+        subs = _fallback()
+        logger.info(f"TEST_MODE 활성 — TEST_EMAIL 로만 발송: {[s['email'] for s in subs]}")
+        return subs
 
     if not SUPABASE_URL or "placeholder" in SUPABASE_URL:
-        # Supabase 미설정 시 테스트 이메일
-        test = os.getenv("TEST_EMAIL", "")
-        return [e.strip() for e in test.split(",") if e.strip()]
+        return _fallback()
 
     try:
         from supabase import create_client
         sb = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        response = sb.table("subscribers").select("email").eq("is_active", True).execute()
-        emails = [s["email"] for s in (response.data or [])]
-        logger.info(f"활성 구독자: {len(emails)}명")
-        return emails
+        response = sb.table("subscribers").select("id, email").eq("is_active", True).execute()
+        subs = response.data or []
+        logger.info(f"활성 구독자: {len(subs)}명")
+        return subs
     except Exception as e:
         logger.error(f"구독자 조회 실패: {e}")
-        # 폴백: TEST_EMAIL로 발송
-        test = os.getenv("TEST_EMAIL", "")
-        fallback = [e.strip() for e in test.split(",") if e.strip()]
-        if fallback:
-            logger.info(f"TEST_EMAIL 폴백: {fallback}")
-        return fallback
+        subs = _fallback()
+        if subs:
+            logger.info(f"TEST_EMAIL 폴백: {[s['email'] for s in subs]}")
+        return subs
 
 
-def send_emails(html, to_emails):
-    """Resend로 이메일 발송."""
+def get_db_client():
+    """SupabaseClient 반환. TEST_MODE 또는 미설정이면 None (DB 기록 건너뜀)."""
+    if os.getenv("TEST_MODE") == "1":
+        return None
+    if not SUPABASE_URL or "placeholder" in SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    try:
+        from db.supabase_client import SupabaseClient
+        return SupabaseClient()
+    except Exception as e:
+        logger.error(f"Supabase 클라이언트 초기화 실패: {e}")
+        return None
+
+
+def save_report_to_db(db, html):
+    """weekly_reports 에 행을 생성하고 id 를 반환. 실패 시 None."""
+    if not db:
+        return None
+    try:
+        return db.save_report({
+            "week_start": TODAY,
+            "week_end": TODAY,
+            "html_content": html,
+        })
+    except Exception as e:
+        logger.error(f"weekly_reports 저장 실패: {e}")
+        return None
+
+
+def send_emails(html, subs, db=None, report_id=None):
+    """Resend 로 발송 + 각 건을 send_logs 에 기록."""
     if not RESEND_API_KEY:
         logger.warning("RESEND_API_KEY 미설정 — 이메일 발송 생략")
         return
 
     from mailer.resend_mailer import ResendMailer
     mailer = ResendMailer(api_key=RESEND_API_KEY)
-    subject = f"[Interior Daily Insight] 오늘의 인사이트가 도착하였습니다"
-    result = mailer.send_batch(to_emails, subject, html)
-    logger.info(f"발송: 성공 {result['success']}, 실패 {result['failed']}")
+    subject = "[Interior Daily Insight] 오늘의 인사이트가 도착하였습니다"
+
+    success = 0
+    failed = 0
+    for sub in subs:
+        email = sub.get("email")
+        sub_id = sub.get("id")
+        ok = mailer.send(email, subject, html)
+        if ok:
+            success += 1
+        else:
+            failed += 1
+        if db and report_id and sub_id:
+            try:
+                db.log_send(
+                    report_id,
+                    sub_id,
+                    "success" if ok else "failed",
+                    None if ok else "resend send failed",
+                )
+            except Exception as e:
+                logger.error(f"send_logs 기록 실패 ({email}): {e}")
+        time.sleep(0.2)
+
+    logger.info(f"발송: 성공 {success}, 실패 {failed}")
+
+    if db and report_id:
+        try:
+            db.update_report_sent(report_id, success)
+        except Exception as e:
+            logger.error(f"weekly_reports.sent_at 업데이트 실패: {e}")
 
 
 # ══════════════════════════════════════════════════════
@@ -571,7 +629,9 @@ def main():
     logger.info("[7/7] 이메일 발송")
     subscribers = get_subscribers()
     if subscribers:
-        send_emails(html, subscribers)
+        db = get_db_client()
+        report_id = save_report_to_db(db, html)
+        send_emails(html, subscribers, db=db, report_id=report_id)
     else:
         logger.info("발송 대상 없음")
 
