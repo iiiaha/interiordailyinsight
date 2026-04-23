@@ -1,18 +1,26 @@
 """Supabase 데이터베이스 클라이언트 래퍼."""
 
 import logging
+import os
 from typing import Optional
 from supabase import create_client, Client
-from config.settings import SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 logger = logging.getLogger(__name__)
 
 
 class SupabaseClient:
-    """Supabase DB 작업을 위한 래퍼 클래스. service_role 키로 RLS 우회."""
+    """Supabase DB 작업을 위한 래퍼 클래스. service_role 키로 RLS 우회.
+
+    config.settings 대신 env 를 직접 읽음 — 이 모듈만 단독으로 쓸 수 있도록
+    (NAVER_CLIENT_ID 등 수집 관련 필수 env 가 없는 환경에서도 동작).
+    """
 
     def __init__(self):
-        self.client: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        if not url or not key:
+            raise EnvironmentError("SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY 미설정")
+        self.client: Client = create_client(url, key)
         logger.info("Supabase 클라이언트 초기화 완료")
 
     def get_active_subscribers(self) -> list[dict]:
