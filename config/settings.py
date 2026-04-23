@@ -29,8 +29,11 @@ SENDGRID_FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL", "insight@yourdomain.com")
 SENDGRID_FROM_NAME = os.getenv("SENDGRID_FROM_NAME", "인테리어 인사이트 위클리")
 
 # Supabase
+# SUPABASE_KEY (anon) 는 랜딩 가입폼 등 브라우저용.
+# 백엔드는 RLS 우회를 위해 service_role 키를 사용한다.
 SUPABASE_URL = _require("SUPABASE_URL")
 SUPABASE_KEY = _require("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = _require("SUPABASE_SERVICE_ROLE_KEY")
 
 # 리포트 스케줄
 REPORT_SEND_DAY = os.getenv("REPORT_SEND_DAY", "monday")

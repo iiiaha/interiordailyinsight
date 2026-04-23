@@ -3,16 +3,16 @@
 import logging
 from typing import Optional
 from supabase import create_client, Client
-from config.settings import SUPABASE_URL, SUPABASE_KEY
+from config.settings import SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 logger = logging.getLogger(__name__)
 
 
 class SupabaseClient:
-    """Supabase DB 작업을 위한 래퍼 클래스."""
+    """Supabase DB 작업을 위한 래퍼 클래스. service_role 키로 RLS 우회."""
 
     def __init__(self):
-        self.client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        self.client: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
         logger.info("Supabase 클라이언트 초기화 완료")
 
     def get_active_subscribers(self) -> list[dict]:

@@ -14,6 +14,7 @@ def mock_settings():
         "SENDGRID_FROM_EMAIL": "test@test.com",
         "SUPABASE_URL": "https://test.supabase.co",
         "SUPABASE_KEY": "test_key",
+        "SUPABASE_SERVICE_ROLE_KEY": "test_service_key",
     }):
         yield
 

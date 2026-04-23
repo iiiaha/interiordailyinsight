@@ -21,16 +21,16 @@ load_dotenv(PROJECT_ROOT / ".env")
 from supabase import create_client
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 DATA_DIR = PROJECT_ROOT / "data"
 
 
 @st.cache_resource
 def get_supabase():
-    if not SUPABASE_URL or "placeholder" in SUPABASE_URL:
+    if not SUPABASE_URL or "placeholder" in SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
         return None
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
+    return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 
 # ── 페이지 설정 ──────────────────────────────────────

@@ -490,6 +490,68 @@ a { color: inherit; text-decoration: none; }
 .note .nt-body { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
 .note code { font-family: var(--mono); font-size: 12px; background: rgba(61,74,60,0.1); padding: 1px 5px; border-radius: 3px; }
 
+/* ─ LOGIN ─ */
+.login-wrap {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 36px 32px 28px;
+  width: 100%; max-width: 380px;
+  box-shadow: var(--shadow-md);
+}
+.login-card .brand {
+  padding: 0; border: none; margin-bottom: 28px;
+}
+.login-card .brand .name { font-size: 16px; font-weight: 700; }
+.login-card .brand .sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.2px; text-transform: uppercase; }
+.login-field { margin-bottom: 14px; }
+.login-field label { display: block; font-size: 11px; color: var(--ink-3); font-weight: 600; letter-spacing: 0.4px; margin-bottom: 6px; text-transform: uppercase; }
+.login-field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+.login-field input:focus { outline: none; border-color: var(--olive); }
+.login-btn {
+  width: 100%;
+  background: var(--olive);
+  color: #fff;
+  font-weight: 600;
+  padding: 11px;
+  border-radius: 6px;
+  margin-top: 10px;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.login-btn:hover { background: #2f3b2e; }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.login-msg { font-size: 12px; margin-top: 12px; min-height: 16px; text-align: center; }
+.login-msg.err { color: var(--danger); }
+
+/* ─ LOGOUT ─ */
+.logout-btn {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-top: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.logout-btn:hover { color: var(--danger); border-color: var(--danger); background: rgba(139,58,58,0.04); }
+
 /* responsive */
 @media (max-width: 980px) {
   .app { grid-template-columns: 1fr; }
@@ -503,7 +565,29 @@ a { color: inherit; text-decoration: none; }
 </head>
 <body>
 
-<div class="app">
+<!-- Login overlay -->
+<div class="login-wrap" id="login-wrap" style="display:none">
+  <div class="login-card">
+    <div class="brand">
+      <div class="name">Interior Daily Insight</div>
+      <div class="sub">Admin Login</div>
+    </div>
+    <form id="login-form" autocomplete="on">
+      <div class="login-field">
+        <label for="login-email">이메일</label>
+        <input type="email" id="login-email" autocomplete="username" required>
+      </div>
+      <div class="login-field">
+        <label for="login-password">비밀번호</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="login-btn" id="login-submit">로그인</button>
+      <div class="login-msg" id="login-msg"></div>
+    </form>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
 
 <aside class="sidebar">
   <div class="brand">
@@ -522,6 +606,7 @@ a { color: inherit; text-decoration: none; }
   <div class="sidebar-footer">
     <div class="meta" id="side-date">—</div>
     <div class="meta small" id="side-circ">—</div>
+    <button class="logout-btn" id="logout-btn">로그아웃</button>
   </div>
 </aside>
 
@@ -721,21 +806,127 @@ a { color: inherit; text-decoration: none; }
 const SUPABASE_URL = 'https://laqcyjujsbfuqcmiylav.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcWN5anVqc2JmdXFjbWl5bGF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMDM3MjEsImV4cCI6MjA5MDY3OTcyMX0.JpHBbudNjK_jytTc8zr0UJATohSWViXkiILahpKLK54';
 
+const SESSION_KEY = 'idi_admin_session';
+
+function getSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+function setSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function showLogin(msg) {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-wrap').style.display = 'flex';
+  const el = document.getElementById('login-msg');
+  if (msg) { el.className = 'login-msg err'; el.textContent = msg; }
+  else { el.className = 'login-msg'; el.textContent = ''; }
+  setTimeout(() => document.getElementById('login-email').focus(), 50);
+}
+function showApp() {
+  document.getElementById('login-wrap').style.display = 'none';
+  document.getElementById('app').style.display = 'grid';
+}
+
+async function refreshAccessToken() {
+  const s = getSession();
+  if (!s || !s.refresh_token) return false;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: s.refresh_token }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+    });
+    return true;
+  } catch { return false; }
+}
+
 async function sb(path, opts = {}) {
+  let s = getSession();
+  if (!s) { showLogin('세션이 만료되었습니다.'); throw new Error('no session'); }
+  // 만료 60초 전에 미리 refresh
+  if (s.expires_at && s.expires_at - Math.floor(Date.now() / 1000) < 60) {
+    const ok = await refreshAccessToken();
+    if (!ok) { clearSession(); showLogin('세션이 만료되었습니다. 다시 로그인 해주세요.'); throw new Error('refresh failed'); }
+    s = getSession();
+  }
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     headers: {
       apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Authorization: `Bearer ${s.access_token}`,
       'Content-Type': 'application/json',
       Prefer: opts.prefer || 'return=representation',
       ...(opts.headers || {}),
     },
     ...opts,
   });
+  if (res.status === 401) {
+    // refresh 시도 후 1회 재시도
+    if (await refreshAccessToken()) {
+      return sb(path, opts);
+    }
+    clearSession();
+    showLogin('세션이 만료되었습니다. 다시 로그인 해주세요.');
+    throw new Error('401 unauthorized');
+  }
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   const txt = await res.text();
   return txt ? JSON.parse(txt) : null;
 }
+
+async function login(email, password) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error_description || err.msg || '로그인 실패');
+  }
+  const data = await res.json();
+  setSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+  });
+}
+
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-submit');
+  const msg = document.getElementById('login-msg');
+  btn.disabled = true; btn.textContent = '로그인 중…';
+  msg.className = 'login-msg'; msg.textContent = '';
+  try {
+    await login(email, password);
+    showApp();
+    document.getElementById('login-password').value = '';
+    boot();
+  } catch (err) {
+    msg.className = 'login-msg err';
+    msg.textContent = err.message || '로그인 실패';
+  } finally {
+    btn.disabled = false; btn.textContent = '로그인';
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  if (!confirm('로그아웃 하시겠습니까?')) return;
+  clearSession();
+  location.reload();
+});
 
 function pad(n) { return String(n).padStart(2, '0'); }
 function fmtDate(d) {
@@ -1052,8 +1243,22 @@ function drawBreakdown() {
 }
 
 // Boot
-updateMeta();
-loadSubscribers();
+function boot() {
+  updateMeta();
+  loadSubscribers();
+}
+
+(async function init() {
+  const s = getSession();
+  if (!s) { showLogin(); return; }
+  // 만료된 토큰이면 refresh 시도
+  if (s.expires_at && s.expires_at - Math.floor(Date.now() / 1000) < 60) {
+    const ok = await refreshAccessToken();
+    if (!ok) { clearSession(); showLogin(); return; }
+  }
+  showApp();
+  boot();
+})();
 </script>
 </body>
 </html>

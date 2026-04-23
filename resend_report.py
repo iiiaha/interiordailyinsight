@@ -33,7 +33,7 @@ if os.getenv("TEST_MODE") == "1":
     print(f"TEST_MODE → {emails}")
 else:
     from supabase import create_client
-    sb = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+    sb = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY"))
     response = sb.table("subscribers").select("email").eq("is_active", True).execute()
     emails = [s["email"] for s in (response.data or [])]
     print(f"활성 구독자: {len(emails)}명 → {emails}")

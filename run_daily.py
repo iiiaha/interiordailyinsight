@@ -42,7 +42,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
 TODAY_LABEL = datetime.now().strftime("%Y-%m-%d (%a)")
@@ -455,7 +455,7 @@ def get_subscribers():
 
     try:
         from supabase import create_client
-        sb = create_client(SUPABASE_URL, SUPABASE_KEY)
+        sb = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
         response = sb.table("subscribers").select("email").eq("is_active", True).execute()
         emails = [s["email"] for s in (response.data or [])]
         logger.info(f"활성 구독자: {len(emails)}명")
